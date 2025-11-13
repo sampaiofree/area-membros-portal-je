@@ -1,0 +1,36 @@
+@extends('layouts.app')
+
+@section('title', 'Entrar')
+
+@section('content')
+    <div class="mx-auto max-w-md rounded-card bg-white p-8 shadow-card">
+        <h1 class="font-display text-3xl text-edux-primary">Acesse sua conta</h1>
+        <p class="mt-2 text-sm text-slate-600">
+            Utilize o e-mail fornecido. Usuários de teste: <strong>admin@edux.test</strong>,
+            <strong>professora@edux.test</strong>, <strong>aluno@edux.test</strong> (senha <code>password</code>).
+        </p>
+        <form method="POST" action="{{ route('login.store') }}" class="mt-6 space-y-4">
+            @csrf
+            <label class="space-y-2 text-sm font-semibold text-slate-600">
+                <span>E-mail</span>
+                <input type="email" name="email" value="{{ old('email') }}" required autofocus
+                    class="w-full rounded-xl border border-edux-line px-4 py-3 focus:border-edux-primary focus:ring-edux-primary/30">
+            </label>
+
+            <label class="space-y-2 text-sm font-semibold text-slate-600">
+                <span>Senha</span>
+                <input type="password" name="password" required
+                    class="w-full rounded-xl border border-edux-line px-4 py-3 focus:border-edux-primary focus:ring-edux-primary/30">
+            </label>
+
+            <label class="flex items-center gap-2 text-sm text-slate-600">
+                <input type="checkbox" name="remember" value="1" class="rounded border-edux-line text-edux-primary focus:ring-edux-primary/30">
+                <span>Lembrar sessão</span>
+            </label>
+
+            <button type="submit" class="edux-btn w-full">
+                👉 Entrar
+            </button>
+        </form>
+    </div>
+@endsection

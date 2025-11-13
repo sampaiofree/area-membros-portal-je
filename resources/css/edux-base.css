@@ -1,0 +1,154 @@
+:root {
+    --edux-color-primary: #1A73E8;
+    --edux-color-cta: #FBC02D;
+    --edux-color-bg: #F5F5F5;
+    --edux-color-line: #E0E0E0;
+    --edux-color-text: #000000;
+    --edux-font-title: 'Poppins', 'Poppins Bold', sans-serif;
+    --edux-font-body: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --edux-radius-card: 18px;
+    --edux-shadow-card: 0 18px 35px rgba(26, 115, 232, 0.12);
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: var(--edux-font-body);
+    background: var(--edux-color-bg);
+    color: var(--edux-color-text);
+    line-height: 1.7;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--edux-font-title);
+    font-weight: 700;
+    color: var(--edux-color-text);
+    margin: 0 0 0.75rem 0;
+}
+
+p {
+    margin: 0 0 1rem 0;
+    font-size: 1.125rem;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.edux-header {
+    background: var(--edux-color-primary);
+    color: #fff;
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.edux-header__logo {
+    font-family: var(--edux-font-title);
+    font-size: 1.5rem;
+    letter-spacing: 0.05em;
+}
+
+.edux-header nav a {
+    margin-left: 1rem;
+    font-weight: 600;
+    opacity: 0.85;
+}
+
+.edux-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 50px;
+    padding: 0 1.75rem;
+    border-radius: 12px;
+    background: var(--edux-color-cta);
+    color: var(--edux-color-text);
+    font-family: var(--edux-font-body);
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    transition: transform 200ms ease, box-shadow 200ms ease;
+}
+
+.edux-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(251, 192, 45, 0.35);
+}
+
+.edux-card {
+    background: #fff;
+    border-radius: var(--edux-radius-card);
+    border: 1px solid var(--edux-color-line);
+    padding: 1.5rem;
+    box-shadow: var(--edux-shadow-card);
+}
+
+.edux-card__illustration {
+    height: 120px;
+    margin-bottom: 1rem;
+    background: linear-gradient(135deg, rgba(26, 115, 232, 0.15), rgba(251, 192, 45, 0.2));
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+}
+
+.edux-grid {
+    display: grid;
+    gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+    .edux-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+.edux-section {
+    padding: 3rem 1.5rem;
+}
+
+.edux-section:nth-child(even) {
+    background: #ffffff;
+}
+
+.edux-steps {
+    display: grid;
+    gap: 1rem;
+}
+
+.edux-step {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.edux-step__icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: rgba(26, 115, 232, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    color: var(--edux-color-primary);
+}
+
+.edux-footer {
+    background: #0f2e73;
+    color: #fff;
+    padding: 2rem 1.5rem;
+    text-align: center;
+    font-size: 1.125rem;
+}

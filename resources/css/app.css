@@ -1,0 +1,57 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    body {
+        @apply bg-edux-background text-edux-text font-sans antialiased;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        @apply font-display text-edux-text font-bold;
+    }
+}
+
+@layer components {
+    .edux-btn {
+        @apply inline-flex items-center justify-center gap-2 rounded-xl bg-edux-cta px-6 py-3 text-base font-semibold text-edux-text shadow-card transition hover:-translate-y-0.5 hover:shadow-cta-hover;
+        min-height: 50px;
+    }
+
+    .edux-card {
+        @apply rounded-card border border-edux-line bg-white p-6 shadow-card;
+    }
+
+    .edux-section {
+        @apply py-12 px-4 sm:px-8;
+    }
+
+    .edux-grid {
+        @apply grid gap-6 md:grid-cols-2;
+    }
+
+    .card {
+        @apply edux-card;
+    }
+
+    .btn {
+        @apply edux-btn;
+    }
+
+    .btn-primary {
+        @apply edux-btn;
+    }
+
+    .btn-secondary {
+        @apply edux-btn bg-white text-edux-primary;
+    }
+
+    .btn-danger {
+        @apply edux-btn bg-red-500 text-white;
+    }
+}

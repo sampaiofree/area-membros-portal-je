@@ -1,0 +1,104 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+
+class Course extends Model
+{
+    use HasFactory;
+
+    protected $fillable = [
+        'owner_id',
+        'title',
+        'slug',
+        'summary',
+        'description',
+        'status',
+        'duration_minutes',
+        'published_at',
+    ];
+
+    protected function casts(): array
+    {
+        return [
+            'published_at' => 'datetime',
+        ];
+    }
+
+    public function owner(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'owner_id');
+    }
+
+    public function modules(): HasMany
+    {
+        return $this->hasMany(Module::class)->orderBy('position');
+    }
+
+    public function enrollments(): HasMany
+    {
+        return $this->hasMany(Enrollment::class);
+    }
+
+    public function students(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'enrollments');
+    }
+
+    public function lessons(): HasManyThrough
+    {
+        return $this->hasManyThrough(Lesson::class, Module::class);
+    }
+
+    public function finalTest(): HasOne
+    {
+        return $this->hasOne(FinalTest::class);
+    }
+
+    public function certificates(): HasMany
+    {
+        return $this->hasMany(Certificate::class);
+    }
+
+    public function certificateBranding(): HasOne
+    {
+        return $this->hasOne(CertificateBranding::class);
+    }
+
+    public function nextLessonFor(User $user): ?Lesson
+    {
+        $completedLessonIds = $user->lessonCompletions()
+            ->whereHas('lesson.module', fn ($query) => $query->where('course_id', $this->id))
+            ->pluck('lesson_id')
+            ->all();
+
+        return $this->lessons()
+            ->with('module')
+            ->orderBy('modules.position')
+            ->orderBy('lessons.position')
+            ->get()
+            ->first(fn (Lesson $lesson) => ! in_array($lesson->id, $completedLessonIds, true));
+    }
+
+    public function completionPercentageFor(User $user): int
+    {
+        $totalLessons = $this->lessons()->count();
+
+        if ($totalLessons === 0) {
+            return 0;
+        }
+
+        $completedLessons = $user->lessonCompletions()
+            ->whereHas('lesson.module', fn ($query) => $query->where('course_id', $this->id))
+            ->count();
+
+        return (int) round(($completedLessons / $totalLessons) * 100);
+    }
+}

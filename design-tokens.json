@@ -1,0 +1,92 @@
+{
+  "meta": {
+    "brand": "EduX",
+    "version": "1.0.0",
+    "description": "Design tokens gerados a partir do guia visual do portal EduX."
+  },
+  "colors": {
+    "primary": {
+      "value": "#1A73E8",
+      "description": "Azul institucional para cabeçalhos e áreas de destaque."
+    },
+    "cta": {
+      "value": "#FBC02D",
+      "description": "Amarelo padrão para botões e chamadas de ação."
+    },
+    "background": {
+      "value": "#F5F5F5",
+      "description": "Cinza claro aplicado ao fundo geral das páginas."
+    },
+    "line": {
+      "value": "#E0E0E0",
+      "description": "Cinza usado em linhas divisórias e contornos discretos."
+    },
+    "text": {
+      "value": "#000000",
+      "description": "Cor padrão para textos."
+    }
+  },
+  "typography": {
+    "titles": {
+      "family": "Poppins",
+      "weight": 700,
+      "sizeRangePx": [26, 32],
+      "description": "Aplicado a títulos e headings principais."
+    },
+    "body": {
+      "family": "Inter",
+      "weight": 400,
+      "sizeRangePx": [18, 20],
+      "description": "Aplicado a textos gerais e descrições."
+    },
+    "buttons": {
+      "family": "Inter",
+      "weight": 700,
+      "sizePx": 18,
+      "description": "Aplicado a botões com ênfase em legibilidade."
+    }
+  },
+  "buttons": {
+    "default": {
+      "background": "#FBC02D",
+      "textColor": "#000000",
+      "height": "50px",
+      "radius": "12px",
+      "iconRecommendation": ["▶", "👉", "✓"]
+    }
+  },
+  "layout": {
+    "grid": {
+      "columnsDesktop": 2,
+      "mobileFirst": true
+    },
+    "spacing": {
+      "sectionPadding": "3rem",
+      "cardGap": "1.5rem",
+      "whiteSpaceBias": "high"
+    }
+  },
+  "components": {
+    "header": {
+      "background": "#1A73E8",
+      "textColor": "#FFFFFF",
+      "description": "Logo à esquerda, navegação sucinta."
+    },
+    "courseCard": {
+      "background": "#FFFFFF",
+      "border": "1px solid #E0E0E0",
+      "shadow": "0 10px 25px rgba(26, 115, 232, 0.08)",
+      "illustrationStyle": "flat, linhas grossas, azul + amarelo"
+    },
+    "footer": {
+      "background": "#0F2E73",
+      "textColor": "#FFFFFF",
+      "description": "Poucos links, tipografia grande."
+    }
+  },
+  "imagery": {
+    "style": "flat-bold",
+    "palette": ["#1A73E8", "#FBC02D", "#FFFFFF"],
+    "subjects": ["estudo", "trabalho", "personagens sorrindo"]
+  }
+}
