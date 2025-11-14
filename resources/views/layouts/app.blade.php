@@ -3,6 +3,7 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="csrf-token" content="{{ csrf_token() }}">
         <title>@yield('title', 'EduX')</title>
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -38,8 +39,14 @@
                             🏠 Dashboard
                         </a>
                         @if (auth()->user()->isAdmin())
+                            <a href="{{ route('admin.users.index') }}" class="edux-btn bg-white text-edux-primary">
+                                Usu?rios
+                            </a>
+                            <a href="{{ route('admin.users.create') }}" class="edux-btn bg-white text-edux-primary">
+                                Novo usu?rio
+                            </a>
                             <a href="{{ route('admin.identity') }}" class="edux-btn bg-white text-edux-primary">
-                               📚 Identidade
+                               ?? Identidade
                             </a>
                         @endif
                         <form method="POST" action="{{ route('logout') }}">
@@ -67,6 +74,8 @@
                         <a href="{{ route('dashboard') }}" class="block rounded-xl border border-white/20 px-4 py-3 text-center">🏠 Painel</a>
                         <a href="{{ route('dashboard') }}" class="block rounded-xl border border-white/20 px-4 py-3 text-center">📚 Dashboard</a>
                         @if (auth()->user()->isAdmin())
+                            <a href="{{ route('admin.users.index') }}" class="block rounded-xl border border-white/20 px-4 py-3 text-center">Usu?rios</a>
+                            <a href="{{ route('admin.users.create') }}" class="block rounded-xl border border-white/20 px-4 py-3 text-center">Novo usu?rio</a>
                             <a href="{{ route('admin.identity') }}" class="block rounded-xl border border-white/20 px-4 py-3 text-center">Identidade visual</a>
                         @endif
                         <form method="POST" action="{{ route('logout') }}">

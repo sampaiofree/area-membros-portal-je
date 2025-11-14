@@ -1,6 +1,7 @@
 ﻿<?php
 
 use App\Http\Controllers\Admin\SystemIdentityController;
+use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CourseCertificateController;
 use App\Http\Controllers\CourseController;
@@ -48,7 +49,15 @@ Route::middleware('auth')->group(function (): void {
             ->name('admin.identity');
         Route::put('admin/identity', [SystemIdentityController::class, 'update'])
             ->name('admin.identity.update');
-        Route::view('admin/professors/create', 'admin.professors.create')
+        Route::get('admin/users', [UserController::class, 'index'])
+            ->name('admin.users.index');
+        Route::get('admin/users/create', fn () => view('admin.users.create'))
+            ->name('admin.users.create');
+        Route::get('admin/users/{user}/edit', [UserController::class, 'edit'])
+            ->name('admin.users.edit');
+        Route::put('admin/users/{user}', [UserController::class, 'update'])
+            ->name('admin.users.update');
+        Route::view('admin/professors/create', 'admin.users.create')
             ->name('admin.professors.create');
         Route::view('admin/certificates/payments', 'admin.certificates.payments')
             ->name('admin.certificates.payments');
@@ -82,4 +91,3 @@ Route::middleware('auth')->group(function (): void {
                 ->name('courses.certificate.download');
         });
 });
-

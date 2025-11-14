@@ -1,11 +1,14 @@
+@php use Illuminate\Support\Str; @endphp
+
 <section class="rounded-card bg-white p-6 shadow-card space-y-6">
     <div class="flex flex-wrap items-center justify-between gap-3">
         <div>
-            <p class="text-sm uppercase tracking-wide text-edux-primary">Questões</p>
+            <p class="text-sm uppercase tracking-wide text-edux-primary">Questoes</p>
             <h3 class="text-xl font-display text-edux-primary">{{ $questions->count() }} cadastradas</h3>
+            <p class="text-xs text-slate-500">Organize o enunciado, peso e alternativas de cada questao.</p>
         </div>
-        <button type="button" class="edux-btn" wire:click="showCreateForm">
-            {{ $editingQuestion ? 'Editar questão' : 'Nova questão' }}
+        <button type="button" class="edux-btn" wire:click="showCreateForm" wire:loading.attr="disabled">
+            {{ $editingQuestion ? 'Editar questao' : 'Nova questao' }}
         </button>
     </div>
 
@@ -15,20 +18,22 @@
                 <div class="flex flex-wrap items-start justify-between gap-3">
                     <div class="flex items-start gap-3">
                         <div class="flex flex-col text-sm text-slate-500">
-                            <button type="button" wire:click.prevent="moveQuestion({{ $question->id }}, 'up')" class="rounded-full bg-edux-background px-2 py-1 hover:text-edux-primary" aria-label="Mover questão para cima">&uarr;</button>
-                            <button type="button" wire:click.prevent="moveQuestion({{ $question->id }}, 'down')" class="mt-1 rounded-full bg-edux-background px-2 py-1 hover:text-edux-primary" aria-label="Mover questão para baixo">&darr;</button>
+                            <button type="button" wire:click.prevent="moveQuestion({{ $question->id }}, 'up')" class="rounded-full bg-edux-background px-2 py-1 hover:text-edux-primary" aria-label="Mover questao para cima">&uarr;</button>
+                            <button type="button" wire:click.prevent="moveQuestion({{ $question->id }}, 'down')" class="mt-1 rounded-full bg-edux-background px-2 py-1 hover:text-edux-primary" aria-label="Mover questao para baixo">&darr;</button>
                         </div>
                         <div>
-                            <p class="text-xs uppercase tracking-wide text-slate-500">Posição {{ $question->position }} · Peso {{ $question->weight }}</p>
+                            <p class="text-xs uppercase tracking-wide text-slate-500">Posicao {{ $question->position }} • Peso {{ $question->weight }}</p>
                             <h4 class="text-lg font-display text-edux-primary">{{ $question->title }}</h4>
-                            <p class="text-sm text-slate-600">{{ $question->statement ? Str::limit(strip_tags($question->statement), 140) : 'Sem enunciado adicional.' }}</p>
+                            <p class="text-sm text-slate-600">
+                                {{ $question->statement ? Str::limit(strip_tags($question->statement), 140) : 'Sem enunciado adicional.' }}
+                            </p>
                         </div>
                     </div>
                     <div class="flex flex-col items-end gap-2 text-sm font-semibold text-edux-primary">
-                        <button type="button" wire:click="startEdit({{ $question->id }})" class="underline-offset-2 hover:underline text-left">Editar</button>
-                        <button type="button" onclick="if(!confirm('Remover questão?')) return;" wire:click="deleteQuestion({{ $question->id }})" class="text-red-500 underline-offset-2 hover:underline text-left">Excluir</button>
-                        <button type="button" class="underline-offset-2 hover:underline text-left" @click="openQuestion = !openQuestion">
-                            <span x-text="openQuestion ? 'Fechar opções' : 'Gerenciar opções'"></span>
+                        <button type="button" wire:click="startEdit({{ $question->id }})" class="underline-offset-2 hover:underline">Editar</button>
+                        <button type="button" onclick="if(!confirm('Remover questao?')) return;" wire:click="deleteQuestion({{ $question->id }})" class="text-red-500 underline-offset-2 hover:underline">Excluir</button>
+                        <button type="button" class="underline-offset-2 hover:underline" @click="openQuestion = !openQuestion">
+                            <span x-text="openQuestion ? 'Fechar opcoes' : 'Gerenciar opcoes'"></span>
                         </button>
                     </div>
                 </div>
@@ -37,7 +42,7 @@
                 </div>
             </article>
         @empty
-            <p class="text-sm text-slate-500">Adicione questões de múltipla escolha para liberar o teste.</p>
+            <p class="text-sm text-slate-500">Adicione questoes de multipla escolha para concluir o teste.</p>
         @endforelse
     </div>
 
@@ -47,14 +52,14 @@
             <div class="relative z-10 w-full max-w-4xl rounded-3xl bg-white p-6 shadow-2xl">
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-xs uppercase tracking-wide text-edux-primary">Formulário</p>
-                        <h3 class="text-2xl font-display text-edux-primary">{{ $editingQuestion ? 'Editar questão' : 'Nova questão' }}</h3>
+                        <p class="text-xs uppercase tracking-wide text-edux-primary">Formulario</p>
+                        <h3 class="text-2xl font-display text-edux-primary">{{ $editingQuestion ? 'Editar questao' : 'Nova questao' }}</h3>
                     </div>
                     <button type="button" class="text-sm font-semibold text-slate-500 hover:text-edux-primary" wire:click="cancelEdit">Fechar</button>
                 </div>
                 <form wire:submit.prevent="{{ $editingQuestion ? 'updateQuestion' : 'createQuestion' }}" class="mt-6 grid gap-4 md:grid-cols-2">
                     <label class="space-y-2 text-sm font-semibold text-slate-600 md:col-span-2">
-                        <span>Título</span>
+                        <span>Titulo</span>
                         <input type="text" wire:model.defer="title" required class="w-full rounded-xl border border-edux-line px-4 py-3 focus:border-edux-primary focus:ring-edux-primary/30">
                         @error('title') <span class="text-xs text-red-500">{{ $message }}</span> @enderror
                     </label>
@@ -64,7 +69,7 @@
                         @error('statement') <span class="text-xs text-red-500">{{ $message }}</span> @enderror
                     </label>
                     <label class="space-y-2 text-sm font-semibold text-slate-600">
-                        <span>Posição</span>
+                        <span>Posicao</span>
                         <input type="number" min="1" wire:model.defer="position" class="w-full rounded-xl border border-edux-line px-4 py-3 focus:border-edux-primary focus:ring-edux-primary/30">
                         @error('position') <span class="text-xs text-red-500">{{ $message }}</span> @enderror
                     </label>
@@ -74,8 +79,8 @@
                         @error('weight') <span class="text-xs text-red-500">{{ $message }}</span> @enderror
                     </label>
                     <div class="md:col-span-2 flex flex-wrap gap-3">
-                        <button type="submit" class="edux-btn">
-                            {{ $editingQuestion ? 'Salvar questão' : 'Adicionar questão' }}
+                        <button type="submit" class="edux-btn" wire:loading.attr="disabled">
+                            {{ $editingQuestion ? 'Salvar questao' : 'Adicionar questao' }}
                         </button>
                         <button type="button" class="edux-btn bg-white text-edux-primary" wire:click="cancelEdit">Cancelar</button>
                     </div>

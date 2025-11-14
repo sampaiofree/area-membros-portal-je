@@ -81,6 +81,7 @@ class FinalTestManager extends Component
 
     public function openForm(): void
     {
+        $this->resetErrorBag();
         $this->showForm = true;
     }
 
@@ -92,7 +93,9 @@ class FinalTestManager extends Component
 
     public function render()
     {
-        return view('livewire.admin.final-test-manager');
+        return view('livewire.admin.final-test-manager', [
+            'metrics' => $this->metrics,
+        ]);
     }
 
     private function authorizeUser(): void
@@ -141,6 +144,16 @@ class FinalTestManager extends Component
             'max_attempts' => 1,
             'duration_minutes' => null,
         ]);
+    }
+
+    public function getMetricsProperty(): array
+    {
+        return [
+            'questions' => $this->finalTest?->questions->count() ?? 0,
+            'passing_score' => $this->finalTest?->passing_score ?? 0,
+            'max_attempts' => $this->finalTest?->max_attempts ?? 0,
+            'duration' => $this->finalTest?->duration_minutes,
+        ];
     }
 
     private function rules(): array

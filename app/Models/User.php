@@ -25,6 +25,7 @@ class User extends Authenticatable
         'display_name',
         'password',
         'role',
+        'whatsapp',
         'qualification',
         'profile_photo_path',
         'name_change_available',
