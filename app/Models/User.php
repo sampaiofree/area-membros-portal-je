@@ -25,6 +25,9 @@ class User extends Authenticatable
         'display_name',
         'password',
         'role',
+        'qualification',
+        'profile_photo_path',
+        'name_change_available',
     ];
 
     /**
@@ -77,6 +80,11 @@ class User extends Authenticatable
         return $this->hasMany(Certificate::class);
     }
 
+    public function certificatePayments(): HasMany
+    {
+        return $this->hasMany(CertificatePayment::class);
+    }
+
     public function finalTestAttempts(): HasMany
     {
         return $this->hasMany(FinalTestAttempt::class);
@@ -100,5 +108,12 @@ class User extends Authenticatable
     public function preferredName(): string
     {
         return $this->display_name ?: $this->name;
+    }
+
+    public function profilePhotoUrl(): ?string
+    {
+        return $this->profile_photo_path
+            ? asset('storage/'.$this->profile_photo_path)
+            : null;
     }
 }

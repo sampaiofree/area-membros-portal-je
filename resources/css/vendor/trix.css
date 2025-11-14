@@ -1,0 +1,209 @@
+trix-toolbar {
+    display: block;
+    margin-bottom: 1rem;
+    padding: 0.75rem;
+    border: 1px solid #e0e0e0;
+    border-radius: 1rem;
+    background-color: #f5f5f5;
+    font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+trix-toolbar [data-trix-button-group] {
+    display: flex;
+    gap: 0.25rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.5rem;
+}
+
+trix-toolbar .trix-button-group {
+    display: inline-flex;
+    border: 1px solid #d7d7d7;
+    border-radius: 999px;
+    overflow: hidden;
+    background-color: #fff;
+}
+
+trix-toolbar .trix-button-group:not(:first-child) {
+    margin-left: 0.5rem;
+}
+
+trix-toolbar .trix-button {
+    position: relative;
+    min-width: 2.5rem;
+    padding: 0.35rem 0.75rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: rgba(0, 0, 0, 0.65);
+    border: none;
+    background: transparent;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+trix-toolbar .trix-button:not(:disabled) {
+    cursor: pointer;
+}
+
+trix-toolbar .trix-button.trix-active {
+    background-color: #cfe0ff;
+    color: #19478c;
+}
+
+trix-toolbar .trix-button:disabled {
+    color: rgba(0, 0, 0, 0.25);
+}
+
+trix-toolbar .trix-button--icon {
+    text-indent: -9999px;
+}
+
+trix-toolbar .trix-button--icon::before {
+    content: "";
+    position: absolute;
+    inset: 0.35rem;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    opacity: 0.6;
+}
+
+trix-toolbar .trix-button--icon.trix-active::before {
+    opacity: 1;
+}
+
+trix-toolbar .trix-button--icon:disabled::before {
+    opacity: 0.2;
+}
+
+trix-toolbar .trix-button--icon-bold::before {
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M7 5h6a4 4 0 010 8H7zm0 0v10h7a4 4 0 000-8'/%3E%3C/svg%3E");
+}
+
+trix-toolbar .trix-button--icon-italic::before {
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M19 4h-9m4 16H5m7-16l-4 16'/%3E%3C/svg%3E");
+}
+
+trix-toolbar .trix-button--icon-link::before {
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M10 13a5 5 0 007.54.54l1.92-1.92a5 5 0 00-7.07-7.07L10 6m4 5a5 5 0 00-7.54-.54L4.54 12a5 5 0 007.07 7.07L14 18'/%3E%3C/svg%3E");
+}
+
+trix-toolbar .trix-button--icon-strike::before {
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M4 12h16M16 5H9a3 3 0 00-3 3v0a3 3 0 003 3m5 8H8a3 3 0 01-3-3v0a3 3 0 013-3'/%3E%3C/svg%3E");
+}
+
+trix-toolbar .trix-button--icon-quote::before {
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M17 6H7a2 2 0 00-2 2v4h6v6l6-6V8a2 2 0 00-2-2z'/%3E%3C/svg%3E");
+}
+
+trix-toolbar .trix-button--icon-code::before {
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M16 18l6-6-6-6M8 6l-6 6 6 6'/%3E%3C/svg%3E");
+}
+
+trix-toolbar [data-trix-dialog] {
+    position: relative;
+    display: flex;
+    gap: 0.5rem;
+    padding: 0.5rem 0;
+}
+
+trix-toolbar [data-trix-dialog] input {
+    flex: 1;
+    border: 1px solid #d5d5d5;
+    border-radius: 0.75rem;
+    padding: 0.35rem 0.75rem;
+    font-size: 0.9rem;
+}
+
+trix-toolbar [data-trix-dialog] button {
+    border-radius: 0.75rem;
+    border: 1px solid transparent;
+    padding: 0.35rem 1rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    background-color: #1a73e8;
+    color: #fff;
+    cursor: pointer;
+}
+
+trix-editor {
+    min-height: 180px;
+    border: 1px solid #e0e0e0;
+    border-radius: 1rem;
+    padding: 1rem;
+    background-color: #fff;
+    font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    line-height: 1.5;
+}
+
+trix-editor:focus {
+    outline: 2px solid rgba(26, 115, 232, 0.2);
+    border-color: #1a73e8;
+}
+
+trix-editor [data-trix-placeholder]::before {
+    color: #9ca3af;
+}
+
+.trix-content h1,
+.trix-content h2,
+.trix-content h3 {
+    font-family: "Poppins", "Inter", sans-serif;
+    font-weight: 600;
+    margin-bottom: 0.5em;
+}
+
+.trix-content h1 {
+    font-size: 1.4rem;
+}
+
+.trix-content h2 {
+    font-size: 1.2rem;
+}
+
+.trix-content h3 {
+    font-size: 1rem;
+}
+
+.trix-content p {
+    margin-bottom: 0.75em;
+}
+
+.trix-content ul,
+.trix-content ol {
+    margin-left: 1.25em;
+    margin-bottom: 0.75em;
+}
+
+.trix-content blockquote {
+    border-left: 4px solid #d4d4d8;
+    padding-left: 0.75em;
+    color: #4b5563;
+    margin-bottom: 0.75em;
+}
+
+.trix-content code {
+    font-family: "JetBrains Mono", "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    background-color: #f1f5f9;
+    padding: 0.2em 0.4em;
+    border-radius: 0.375rem;
+    font-size: 0.85em;
+}
+
+.trix-content pre {
+    background-color: #0f172a;
+    color: #e2e8f0;
+    padding: 0.75rem;
+    border-radius: 0.75rem;
+    overflow-x: auto;
+    margin-bottom: 1rem;
+}
+
+.trix-content a {
+    color: #1a73e8;
+    text-decoration: underline;
+}
+
+.trix-content img {
+    max-width: 100%;
+    border-radius: 0.75rem;
+    border: 1px solid #e0e0e0;
+}

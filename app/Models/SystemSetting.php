@@ -1,0 +1,39 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
+
+class SystemSetting extends Model
+{
+    use HasFactory;
+
+    protected $fillable = [
+        'favicon_path',
+        'default_logo_path',
+        'default_logo_dark_path',
+        'default_course_cover_path',
+        'default_module_cover_path',
+        'default_lesson_cover_path',
+        'default_certificate_front_path',
+        'default_certificate_back_path',
+    ];
+
+    public static function current(): self
+    {
+        return static::first() ?? static::create();
+    }
+
+    public function assetUrl(?string $column): ?string
+    {
+        if (! $column) {
+            return null;
+        }
+
+        $path = $this->{$column};
+
+        return $path ? Storage::disk('public')->url($path) : null;
+    }
+}

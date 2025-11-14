@@ -21,10 +21,10 @@
 </head>
 <body>
     <div class="page">
-        {!! $certificate->front_content !!}
+        {!! $frontContent !!}
     </div>
     <div class="page">
-        {!! $certificate->back_content !!}
+        {!! $backContent !!}
     </div>
 </body>
 </html>

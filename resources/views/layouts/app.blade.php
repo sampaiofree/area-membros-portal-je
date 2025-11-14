@@ -8,6 +8,15 @@
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
         @vite(['resources/css/app.css', 'resources/js/app.js'])
+        @livewireStyles
+        @stack('styles')
+        <style>
+            .plyr__video-wrapper iframe{
+                width: 1000% !important;
+                margin-left: -450% !important;
+                }
+            [x-cloak] { display: none !important; }
+        </style>
     </head>
     <body class="min-h-screen bg-edux-background text-edux-text">
         <header class="bg-edux-primary text-white shadow-lg">
@@ -22,12 +31,15 @@
                 </div>
                 <nav class="hidden items-center gap-3 md:flex">
                     @auth
-                        <a href="{{ route('dashboard') }}" class="edux-btn bg-white text-edux-primary hover:-translate-y-0">
-                            🏠 Painel
+                        <a href="{{ route('account.edit') }}" class="edux-btn bg-white text-edux-primary">
+                            ⚙️ Minha conta
                         </a>
-                        @if (auth()->user()->isAdmin() || auth()->user()->isTeacher())
-                            <a href="{{ route('courses.index') }}" class="edux-btn bg-white text-edux-primary">
-                                📚 Cursos
+                        <a href="{{ route('dashboard') }}" class="edux-btn bg-white text-edux-primary hover:-translate-y-0">
+                            🏠 Dashboard
+                        </a>
+                        @if (auth()->user()->isAdmin())
+                            <a href="{{ route('admin.identity') }}" class="edux-btn bg-white text-edux-primary">
+                               📚 Identidade
                             </a>
                         @endif
                         <form method="POST" action="{{ route('logout') }}">
@@ -51,9 +63,11 @@
             <div class="md:hidden" x-show="mobileMenu" x-collapse>
                 <nav class="space-y-3 bg-edux-primary/95 px-4 pb-4 text-white">
                     @auth
+                        <a href="{{ route('account.edit') }}" class="block rounded-xl border border-white/20 px-4 py-3 text-center">⚙️ Minha conta</a>
                         <a href="{{ route('dashboard') }}" class="block rounded-xl border border-white/20 px-4 py-3 text-center">🏠 Painel</a>
-                        @if (auth()->user()->isAdmin() || auth()->user()->isTeacher())
-                            <a href="{{ route('courses.index') }}" class="block rounded-xl border border-white/20 px-4 py-3 text-center">📚 Cursos</a>
+                        <a href="{{ route('dashboard') }}" class="block rounded-xl border border-white/20 px-4 py-3 text-center">📚 Dashboard</a>
+                        @if (auth()->user()->isAdmin())
+                            <a href="{{ route('admin.identity') }}" class="block rounded-xl border border-white/20 px-4 py-3 text-center">Identidade visual</a>
                         @endif
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
@@ -87,15 +101,17 @@
             @yield('content')
         </main>
 
-        <footer class="bg-edux-primary text-white">
-            <div class="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-4 py-6 text-center md:flex-row md:text-left">
-                <p class="font-semibold">© {{ now()->year }} EduX · Aprender é simples.</p>
-                <div class="flex gap-4 text-sm opacity-80">
-                    <a href="#">Políticas</a>
-                    <a href="#">Suporte</a>
-                    <a href="#">Status</a>
-                </div>
+    <footer class="bg-edux-primary text-white">
+        <div class="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-4 py-6 text-center md:flex-row md:text-left">
+            <p class="font-semibold">© {{ now()->year }} EduX · Aprender é simples.</p>
+            <div class="flex gap-4 text-sm opacity-80">
+                <a href="#">Políticas</a>
+                <a href="#">Suporte</a>
+                <a href="#">Status</a>
             </div>
-        </footer>
+        </div>
+    </footer>
+        @livewireScripts
+        @stack('scripts')
     </body>
 </html>

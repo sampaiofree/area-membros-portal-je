@@ -35,4 +35,9 @@ return [
         ],
     ],
 
+    'support' => [
+        'instagram' => env('SUPPORT_INSTAGRAM_URL', 'https://instagram.com/edux'),
+        'whatsapp' => env('SUPPORT_WHATSAPP_URL', 'https://wa.me/5500000000000'),
+    ],
+
 ];

@@ -20,6 +20,8 @@ class Course extends Model
         'slug',
         'summary',
         'description',
+        'cover_image_path',
+        'promo_video_url',
         'status',
         'duration_minutes',
         'published_at',
@@ -30,6 +32,11 @@ class Course extends Model
         return [
             'published_at' => 'datetime',
         ];
+    }
+
+    public function getRouteKeyName(): string
+    {
+        return 'slug';
     }
 
     public function owner(): BelongsTo
@@ -72,6 +79,11 @@ class Course extends Model
         return $this->hasOne(CertificateBranding::class);
     }
 
+    public function certificatePayments(): HasMany
+    {
+        return $this->hasMany(CertificatePayment::class);
+    }
+
     public function nextLessonFor(User $user): ?Lesson
     {
         $completedLessonIds = $user->lessonCompletions()
@@ -100,5 +112,12 @@ class Course extends Model
             ->count();
 
         return (int) round(($completedLessons / $totalLessons) * 100);
+    }
+
+    public function coverImageUrl(): ?string
+    {
+        return $this->cover_image_path
+            ? asset('storage/'.$this->cover_image_path)
+            : null;
     }
 }

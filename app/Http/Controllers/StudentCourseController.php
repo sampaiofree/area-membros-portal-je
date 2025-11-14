@@ -38,40 +38,9 @@ class StudentCourseController extends Controller
 
         abort_if($lesson->module->course_id !== $course->id, 404);
 
-        $course->load([
-            'modules.lessons' => fn ($query) => $query->orderBy('position'),
-            'finalTest',
-        ]);
-
-        $orderedLessons = $course->lessons()
-            ->with('module')
-            ->orderBy('modules.position')
-            ->orderBy('lessons.position')
-            ->get();
-
-        $currentIndex = $orderedLessons->search(fn (Lesson $item) => $item->id === $lesson->id);
-
-        abort_if($currentIndex === false, 404);
-
-        $previousLesson = $currentIndex > 0 ? $orderedLessons[$currentIndex - 1] : null;
-        $nextLesson = $orderedLessons->get($currentIndex + 1);
-
-        $completedLessonIds = $user->lessonCompletions()
-            ->whereHas('lesson.module', fn ($query) => $query->where('course_id', $course->id))
-            ->pluck('lesson_id')
-            ->toArray();
-
-        $isCompleted = in_array($lesson->id, $completedLessonIds, true);
-        $progressPercent = $course->completionPercentageFor($user);
-
         return view('learning.lesson', [
             'course' => $course,
             'lesson' => $lesson,
-            'previousLesson' => $previousLesson,
-            'nextLesson' => $nextLesson,
-            'completedLessonIds' => $completedLessonIds,
-            'isCompleted' => $isCompleted,
-            'progressPercent' => $progressPercent,
         ]);
     }
 }
