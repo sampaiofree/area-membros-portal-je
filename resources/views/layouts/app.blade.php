@@ -40,13 +40,18 @@
                         </a>
                         @if (auth()->user()->isAdmin())
                             <a href="{{ route('admin.users.index') }}" class="edux-btn bg-white text-edux-primary">
-                                Usu?rios
+                                Usuarios
                             </a>
                             <a href="{{ route('admin.users.create') }}" class="edux-btn bg-white text-edux-primary">
-                                Novo usu?rio
+                                Novo usuario
                             </a>
                             <a href="{{ route('admin.identity') }}" class="edux-btn bg-white text-edux-primary">
-                               ?? Identidade
+                               Identidade
+                            </a>
+                        @endif
+                        @if (auth()->user()->isStudent())
+                            <a href="{{ route('learning.notifications.index') }}" class="edux-btn bg-white text-edux-primary">
+                                Notificacoes
                             </a>
                         @endif
                         <form method="POST" action="{{ route('logout') }}">
@@ -74,9 +79,12 @@
                         <a href="{{ route('dashboard') }}" class="block rounded-xl border border-white/20 px-4 py-3 text-center">🏠 Painel</a>
                         <a href="{{ route('dashboard') }}" class="block rounded-xl border border-white/20 px-4 py-3 text-center">📚 Dashboard</a>
                         @if (auth()->user()->isAdmin())
-                            <a href="{{ route('admin.users.index') }}" class="block rounded-xl border border-white/20 px-4 py-3 text-center">Usu?rios</a>
-                            <a href="{{ route('admin.users.create') }}" class="block rounded-xl border border-white/20 px-4 py-3 text-center">Novo usu?rio</a>
+                            <a href="{{ route('admin.users.index') }}" class="block rounded-xl border border-white/20 px-4 py-3 text-center">Usuarios</a>
+                            <a href="{{ route('admin.users.create') }}" class="block rounded-xl border border-white/20 px-4 py-3 text-center">Novo usuario</a>
                             <a href="{{ route('admin.identity') }}" class="block rounded-xl border border-white/20 px-4 py-3 text-center">Identidade visual</a>
+                        @endif
+                        @if (auth()->user()->isStudent())
+                            <a href="{{ route('learning.notifications.index') }}" class="block rounded-xl border border-white/20 px-4 py-3 text-center">Notificacoes</a>
                         @endif
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
@@ -120,6 +128,11 @@
             </div>
         </div>
     </footer>
+        @auth
+            @if (auth()->user()->isStudent())
+                <livewire:student.notification-modal />
+            @endif
+        @endauth
         @livewireScripts
         @stack('scripts')
     </body>

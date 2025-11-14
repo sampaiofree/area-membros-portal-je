@@ -84,6 +84,8 @@ Route::middleware('auth')->group(function (): void {
                 ->name('courses.final-test.attempt');
             Route::post('courses/{course:slug}/final-test/attempt/{attempt}', [StudentFinalTestController::class, 'submit'])
                 ->name('courses.final-test.submit');
+            Route::view('notifications', 'learning.notifications.index')
+                ->name('notifications.index');
 
             Route::get('courses/{course:slug}/certificate/{certificate}', [CourseCertificateController::class, 'show'])
                 ->name('courses.certificate.show');

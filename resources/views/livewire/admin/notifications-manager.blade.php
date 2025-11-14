@@ -2,28 +2,30 @@
     <div class="rounded-card bg-white p-6 shadow-card space-y-4">
         <div class="flex items-center justify-between">
             <div>
-                <p class="text-sm uppercase tracking-wide text-edux-primary">Comunicação</p>
-                <h1 class="text-2xl font-display text-edux-primary">{{ $editing ? 'Editar notificação' : 'Nova notificação' }}</h1>
+                <p class="text-sm uppercase tracking-wide text-edux-primary">Comunicacao</p>
+                <h1 class="text-2xl font-display text-edux-primary">{{ $editing ? 'Editar notificacao' : 'Nova notificacao' }}</h1>
             </div>
             @if ($editing)
-                <button type="button" wire:click="cancelEdit" class="edux-btn bg-white text-edux-primary">Cancelar edição</button>
+                <button type="button" wire:click="cancelEdit" class="edux-btn bg-white text-edux-primary">Cancelar edicao</button>
             @endif
         </div>
 
         <form wire:submit.prevent="save" class="grid gap-4 md:grid-cols-2">
             <label class="space-y-1 text-sm font-semibold text-slate-600">
-                <span>Título</span>
+                <span>Titulo</span>
                 <input type="text" wire:model.defer="title" class="w-full rounded-xl border border-edux-line px-4 py-3">
                 @error('title') <span class="text-xs text-red-500">{{ $message }}</span> @enderror
             </label>
             <label class="space-y-1 text-sm font-semibold text-slate-600">
                 <span>Publicar em</span>
                 <input type="datetime-local" wire:model.defer="published_at" class="w-full rounded-xl border border-edux-line px-4 py-3">
+                @error('published_at') <span class="text-xs text-red-500">{{ $message }}</span> @enderror
             </label>
 
             <label class="md:col-span-2 space-y-1 text-sm font-semibold text-slate-600">
                 <span>Mensagem</span>
                 <textarea wire:model.defer="body" rows="4" class="w-full rounded-xl border border-edux-line px-4 py-3"></textarea>
+                @error('body') <span class="text-xs text-red-500">{{ $message }}</span> @enderror
             </label>
 
             <label class="space-y-1 text-sm font-semibold text-slate-600">
@@ -38,27 +40,30 @@
             </label>
 
             <label class="space-y-1 text-sm font-semibold text-slate-600">
-                <span>Vídeo (URL)</span>
+                <span>Video (URL)</span>
                 <input type="url" wire:model.defer="video_url" class="w-full rounded-xl border border-edux-line px-4 py-3">
+                @error('video_url') <span class="text-xs text-red-500">{{ $message }}</span> @enderror
             </label>
 
             <label class="space-y-1 text-sm font-semibold text-slate-600">
-                <span>Texto do botão</span>
+                <span>Texto do botao</span>
                 <input type="text" wire:model.defer="button_label" class="w-full rounded-xl border border-edux-line px-4 py-3">
+                @error('button_label') <span class="text-xs text-red-500">{{ $message }}</span> @enderror
             </label>
             <label class="space-y-1 text-sm font-semibold text-slate-600">
-                <span>Link do botão</span>
+                <span>Link do botao</span>
                 <input type="url" wire:model.defer="button_url" class="w-full rounded-xl border border-edux-line px-4 py-3">
+                @error('button_url') <span class="text-xs text-red-500">{{ $message }}</span> @enderror
             </label>
 
             <div class="md:col-span-2">
-                <button type="submit" class="edux-btn">Salvar notificação</button>
+                <button type="submit" class="edux-btn">Salvar notificacao</button>
             </div>
         </form>
     </div>
 
     <div class="rounded-card bg-white p-6 shadow-card space-y-4">
-        <h2 class="text-xl font-display text-edux-primary">Notificações publicadas</h2>
+        <h2 class="text-xl font-display text-edux-primary">Notificacoes publicadas</h2>
         <div class="space-y-3">
             @forelse ($notifications as $notification)
                 <article class="rounded-2xl border border-edux-line/70 p-4 flex flex-wrap items-center justify-between gap-3">
@@ -68,11 +73,11 @@
                     </div>
                     <div class="flex gap-2 text-sm font-semibold">
                         <button type="button" wire:click="edit({{ $notification->id }})" class="edux-btn bg-white text-edux-primary">Editar</button>
-                        <button type="button" onclick="if(!confirm('Remover notificação?')) return;" wire:click="delete({{ $notification->id }})" class="edux-btn bg-red-500 text-white">Excluir</button>
+                        <button type="button" onclick="if(!confirm('Remover notificacao?')) return;" wire:click="delete({{ $notification->id }})" class="edux-btn bg-red-500 text-white">Excluir</button>
                     </div>
                 </article>
             @empty
-                <p class="text-sm text-slate-500">Nenhuma notificação cadastrada.</p>
+                <p class="text-sm text-slate-500">Nenhuma notificacao cadastrada.</p>
             @endforelse
         </div>
 

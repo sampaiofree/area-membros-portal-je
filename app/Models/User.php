@@ -86,6 +86,11 @@ class User extends Authenticatable
         return $this->hasMany(CertificatePayment::class);
     }
 
+    public function notificationViews(): HasMany
+    {
+        return $this->hasMany(NotificationView::class);
+    }
+
     public function finalTestAttempts(): HasMany
     {
         return $this->hasMany(FinalTestAttempt::class);

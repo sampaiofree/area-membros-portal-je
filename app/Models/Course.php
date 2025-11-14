@@ -22,6 +22,8 @@ class Course extends Model
         'description',
         'cover_image_path',
         'promo_video_url',
+        'certificate_payment_url',
+        'certificate_price',
         'status',
         'duration_minutes',
         'published_at',
@@ -31,6 +33,7 @@ class Course extends Model
     {
         return [
             'published_at' => 'datetime',
+            'certificate_price' => 'decimal:2',
         ];
     }
 

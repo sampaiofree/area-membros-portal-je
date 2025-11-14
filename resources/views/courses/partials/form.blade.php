@@ -65,23 +65,39 @@
 
     <div class="grid gap-4 md:grid-cols-2">
         <label class="space-y-1 text-sm font-semibold text-slate-600">
-        <span>Imagem de destaque</span>
-        <input type="file" name="cover_image" accept="image/*" class="w-full rounded-xl border border-edux-line px-4 py-3">
-        @error('cover_image') <span class="text-xs text-red-500">{{ $message }}</span> @enderror
-        @if ($course?->coverImageUrl())
-            <div class="mt-2 flex items-center gap-3">
-                <img src="{{ $course->coverImageUrl() }}" alt="Imagem do curso" class="h-20 w-20 rounded-xl border border-edux-line object-cover">
-                <label class="flex items-center gap-2 text-xs font-semibold text-slate-600">
-                    <input type="checkbox" name="remove_cover_image" value="1" class="rounded border-edux-line text-edux-primary focus:ring-edux-primary/50">
-                    <span>Remover imagem atual</span>
-                </label>
-            </div>
-        @endif
-    </label>
-    <label class="space-y-1 text-sm font-semibold text-slate-600">
-        <span>Vídeo promocional (URL)</span>
+            <span>Imagem de destaque</span>
+            <input type="file" name="cover_image" accept="image/*" class="w-full rounded-xl border border-edux-line px-4 py-3">
+            @error('cover_image') <span class="text-xs text-red-500">{{ $message }}</span> @enderror
+            @if ($course?->coverImageUrl())
+                <div class="mt-2 flex items-center gap-3">
+                    <img src="{{ $course->coverImageUrl() }}" alt="Imagem do curso" class="h-20 w-20 rounded-xl border border-edux-line object-cover">
+                    <label class="flex items-center gap-2 text-xs font-semibold text-slate-600">
+                        <input type="checkbox" name="remove_cover_image" value="1" class="rounded border-edux-line text-edux-primary focus:ring-edux-primary/50">
+                        <span>Remover imagem atual</span>
+                    </label>
+                </div>
+            @endif
+        </label>
+        <label class="space-y-1 text-sm font-semibold text-slate-600">
+            <span>Video promocional (URL)</span>
             <input type="url" name="promo_video_url" value="{{ old('promo_video_url', $course->promo_video_url) }}" class="w-full rounded-xl border border-edux-line px-4 py-3">
             @error('promo_video_url') <span class="text-xs text-red-500">{{ $message }}</span> @enderror
+        </label>
+    </div>
+
+    <div class="grid gap-4 md:grid-cols-2">
+        <label class="space-y-1 text-sm font-semibold text-slate-600">
+            <span>URL de pagamento do certificado</span>
+            <input type="url" name="certificate_payment_url" value="{{ old('certificate_payment_url', $course->certificate_payment_url) }}" class="w-full rounded-xl border border-edux-line px-4 py-3">
+            @error('certificate_payment_url') <span class="text-xs text-red-500">{{ $message }}</span> @enderror
+        </label>
+        <label class="space-y-1 text-sm font-semibold text-slate-600">
+            <span>Preco do certificado</span>
+            <div class="relative">
+                <span class="pointer-events-none absolute inset-y-0 left-4 flex items-center text-slate-400">R$</span>
+                <input type="number" step="0.01" min="0" name="certificate_price" value="{{ old('certificate_price', $course->certificate_price) }}" class="w-full rounded-xl border border-edux-line px-4 py-3 pl-10 focus:border-edux-primary focus:ring-edux-primary/30">
+            </div>
+            @error('certificate_price') <span class="text-xs text-red-500">{{ $message }}</span> @enderror
         </label>
     </div>
 
