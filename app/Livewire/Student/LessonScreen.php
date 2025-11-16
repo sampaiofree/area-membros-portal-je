@@ -8,10 +8,12 @@ use App\Models\CertificatePayment;
 use App\Models\Course;
 use App\Models\Lesson;
 use App\Models\LessonCompletion;
+use App\Services\DuxWalletService;
 use App\Support\EnsuresStudentEnrollment;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Livewire\Component;
+use RuntimeException;
 
 class LessonScreen extends Component
 {
@@ -75,8 +77,17 @@ class LessonScreen extends Component
         $nextLesson = $this->course->nextLessonFor($this->user);
         $this->refreshState();
 
+        try {
+            app(DuxWalletService::class)->applyRule($this->user, 'lesson_completed', [
+                'lesson_id' => $this->lesson->id,
+                'course_id' => $this->course->id,
+            ]);
+        } catch (\Throwable $e) {
+            // nao bloqueia fluxo se regra nao existir ou falhar
+        }
+
         if ($nextLesson && $nextLesson->id !== $this->lesson->id) {
-            $this->redirectRoute('learning.courses.lessons.show', [$this->course, $nextLesson]);
+            $this->redirectRoute('learning.courses.lessons.show', [$this->course, $nextLesson], navigate: true);
             return;
         }
 
@@ -135,7 +146,19 @@ class LessonScreen extends Component
         $this->certificate = $certificate;
         $this->statusMessage = 'Certificado emitido com sucesso!';
 
-        $this->redirectRoute('learning.courses.certificate.show', [$this->course, $certificate]);
+        try {
+            app(DuxWalletService::class)->applyRule($this->user, 'certificate_fee', [
+                'course_id' => $this->course->id,
+                'certificate_id' => $certificate->id,
+            ]);
+        } catch (RuntimeException $e) {
+            $this->errorMessage = $e->getMessage();
+            return;
+        } catch (\Throwable $e) {
+            // nao bloqueia fluxo se regra nao existir ou falhar
+        }
+
+        $this->redirectRoute('learning.courses.certificate.show', [$this->course, $certificate], navigate: true);
     }
 
     public function closePaymentModal(): void

@@ -13,17 +13,18 @@
                     <p class="text-xs text-gray-500 truncate">{{ $course->title }}</p>
                     <h1 class="text-lg font-bold text-gray-900 truncate">{{ $lesson->title }}</h1>
                 </div>
-                <div class="flex items-center gap-2 shrink-0">
-                    <span class="text-xs font-semibold text-blue-600 bg-blue-50 px-3 py-1.5 rounded-full">
-                        {{ $progressPercent }}%
-                    </span>
+                <div class="flex items-center gap-3 shrink-0">
+                    <div class="flex flex-col items-center">
+                        <span class="text-2xl font-black text-blue-600">{{ $progressPercent }}%</span>
+                        <span class="text-xs font-semibold text-gray-600">Progresso</span>
+                    </div>
                     <button @click="showLessons = true" 
-                            class="flex items-center gap-1 px-2 py-2 hover:bg-gray-100 rounded-lg transition-colors whitespace-nowrap"
+                            class="flex items-center gap-2 px-4 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold rounded-lg shadow-lg transition-all transform hover:scale-105 active:scale-95 whitespace-nowrap"
                             aria-label="Ver todas as aulas">
-                        <svg class="w-5 h-5 text-gray-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 4.5v15m6-15v15m-11-3.5h16M4.72 19.228A2.04 2.04 0 015.5 19h13a2.04 2.04 0 01.78.228m-14.667-11.667A2.04 2.04 0 015.5 5h13a2.04 2.04 0 01.78.228m0 0A2.001 2.001 0 0021 7v10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h14a2 2 0 012 2z"/> 
+                        <svg class="w-6 h-6 text-white shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 4.5v15m6-15v15m-11-3.5h16M4.72 19.228A2.04 2.04 0 015.5 19h13a2.04 2.04 0 01.78.228m-14.667-11.667A2.04 2.04 0 015.5 5h13a2.04 2.04 0 01.78.228m0 0A2.001 2.001 0 0021 7v10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h14a2 2 0 012 2z"/> 
                         </svg>
-                        <span class="text-xs font-medium">Aulas</span>
+                        <span class="text-sm font-bold">Ver aulas</span>
                     </button>
                 </div>
             </div>
@@ -139,7 +140,7 @@
         {{-- Navegação entre aulas --}}
         <div class="grid grid-cols-2 gap-3">
             @if ($previousLesson)
-                <a href="{{ route('learning.courses.lessons.show', [$course, $previousLesson]) }}" 
+                <a href="{{ route('learning.courses.lessons.show', [$course, $previousLesson]) }}" wire:navigate
                    class="flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-gray-700 font-semibold py-3 px-4 rounded-xl border-2 border-gray-200 transition-all">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
@@ -151,7 +152,7 @@
             @endif
 
             @if ($nextLesson)
-                <a href="{{ route('learning.courses.lessons.show', [$course, $nextLesson]) }}" 
+                <a href="{{ route('learning.courses.lessons.show', [$course, $nextLesson]) }}" wire:navigate
                    class="flex items-center justify-center gap-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-4 rounded-xl shadow-md transition-all">
                     <span>Próxima</span>
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -252,7 +253,7 @@
              x-transition:enter="transition ease-out duration-200"
              x-transition:enter-start="translate-y-full sm:translate-y-0 sm:scale-95"
              x-transition:enter-end="translate-y-0 sm:scale-100"
-             class="bg-white w-full sm:max-w-2xl sm:rounded-2xl rounded-t-3xl max-h-[90vh] flex flex-col shadow-2xl">
+             class="bg-white w-full sm:max-w-2xl sm:rounded-2xl rounded-t-3xl max-h-[90vh] flex flex-col shadow-2xl" style="padding-bottom: 60px;">
             
             {{-- Header do modal --}}
             <div class="flex items-center justify-between p-5 border-b bg-gray-50 sm:rounded-t-2xl rounded-t-3xl sticky top-0">
@@ -299,7 +300,7 @@
                                         $isActive = $moduleLesson->id === $lesson->id;
                                     @endphp
                                     <li>
-                                        <a href="{{ route('learning.courses.lessons.show', [$course, $moduleLesson]) }}"
+                                    <a href="{{ route('learning.courses.lessons.show', [$course, $moduleLesson]) }}" wire:navigate
                                            @class([
                                                'flex items-center justify-between p-4 hover:bg-gray-50 transition-colors',
                                                'bg-blue-50' => $isActive,

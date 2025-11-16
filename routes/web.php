@@ -48,6 +48,13 @@ Route::middleware('auth')->group(function (): void {
     });
 
     Route::middleware('role:admin')->group(function (): void {
+        Route::get('admin/dux/rules', [\App\Http\Controllers\Admin\DuxRuleController::class, 'index'])->name('admin.dux.rules.index');
+        Route::put('admin/dux/rules/{rule}', [\App\Http\Controllers\Admin\DuxRuleController::class, 'update'])->name('admin.dux.rules.update');
+
+        Route::get('admin/dux/packs', [\App\Http\Controllers\Admin\DuxPackController::class, 'index'])->name('admin.dux.packs.index');
+        Route::post('admin/dux/packs', [\App\Http\Controllers\Admin\DuxPackController::class, 'store'])->name('admin.dux.packs.store');
+        Route::put('admin/dux/packs/{pack}', [\App\Http\Controllers\Admin\DuxPackController::class, 'update'])->name('admin.dux.packs.update');
+        Route::delete('admin/dux/packs/{pack}', [\App\Http\Controllers\Admin\DuxPackController::class, 'destroy'])->name('admin.dux.packs.destroy');
         Route::view('certificates/branding', 'certificates.branding.edit')
             ->name('certificates.branding.edit');
         Route::get('admin/identity', [SystemIdentityController::class, 'edit'])

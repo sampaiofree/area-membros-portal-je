@@ -12,6 +12,10 @@
         @livewireStyles
         @stack('styles')
         <style>
+            .plyr__video-wrapper iframe{
+                width: 1000% !important;
+                margin-left: -450% !important;
+                }
             [x-cloak] { display: none !important; }
         </style>
     </head>
