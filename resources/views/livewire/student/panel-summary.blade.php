@@ -7,7 +7,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M4 6.75h16M4 12h16M6 17.25h8" />
                     </svg>
                 </span>
-                <span class="text-sm font-semibold">Meus cursos</span>
+                <span class="text-sm font-semibold">Meus cursos</span> 
             </a>
 
             <a href="{{ route('dashboard', ['tab' => 'vitrine']) }}" @click.prevent="$dispatch('set-tab', 'vitrine')" class="flex flex-col items-center gap-2 rounded-2xl border border-edux-line/60 bg-white p-4 text-center shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">

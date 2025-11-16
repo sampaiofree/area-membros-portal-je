@@ -1,4 +1,4 @@
-﻿@extends('layouts.app')
+﻿@extends('layouts.student')
 
 @section('title', 'Certificado emitido')
 

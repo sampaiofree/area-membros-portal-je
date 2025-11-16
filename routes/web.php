@@ -76,7 +76,9 @@ Route::middleware('auth')->group(function (): void {
         ->group(function (): void {
             Route::get('courses/{course:slug}', [StudentCourseController::class, 'redirectToNextLesson'])
                 ->name('courses.show');
-            Route::get('courses/{course:slug}/lessons/{lesson}', [StudentCourseController::class, 'lesson']) 
+            Route::post('courses/{course:slug}/enroll', [StudentCourseController::class, 'enroll'])
+                ->name('courses.enroll');
+            Route::get('courses/{course:slug}/lessons/{lesson}', [StudentCourseController::class, 'lesson'])
                 ->name('courses.lessons.show');
             Route::post('courses/{course:slug}/lessons/{lesson}/complete', [LessonProgressController::class, 'store'])
                 ->name('courses.lessons.complete');

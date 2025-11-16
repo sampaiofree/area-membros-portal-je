@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Course;
 use App\Models\Lesson;
+use App\Models\Enrollment;
 use App\Support\EnsuresStudentEnrollment;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -38,9 +39,21 @@ class StudentCourseController extends Controller
 
         abort_if($lesson->module->course_id !== $course->id, 404);
 
-        return view('learning.lesson', [ 
+        return view('learning.lesson', [
             'course' => $course,
             'lesson' => $lesson,
         ]);
+    }
+
+    public function enroll(Request $request, Course $course): RedirectResponse
+    {
+        $user = $request->user();
+        Enrollment::firstOrCreate([
+            'course_id' => $course->id,
+            'user_id' => $user->id,
+        ]);
+
+        return redirect()->route('learning.courses.show', $course)
+            ->with('status', 'Inscricao realizada com sucesso. Aproveite o curso!');
     }
 }

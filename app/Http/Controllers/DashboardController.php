@@ -12,7 +12,24 @@ class DashboardController extends Controller
         $user = $request->user();
 
         if ($user->isStudent()) {
-            return view('dashboard.student', ['user' => $user]);
+            $availableTabs = ['painel', 'cursos', 'vitrine', 'notificacoes', 'suporte', 'conta'];
+            $initialTab = in_array($request->query('tab'), $availableTabs, true) ? $request->query('tab') : 'painel';
+            $unreadCount = 0;
+
+            if (
+                \Illuminate\Support\Facades\Schema::hasTable('notifications') &&
+                \Illuminate\Support\Facades\Schema::hasColumn('notifications', 'notifiable_type') &&
+                \Illuminate\Support\Facades\Schema::hasColumn('notifications', 'notifiable_id')
+            ) {
+                $unreadCount = $user->unreadNotifications()->count();
+            }
+
+            return view('dashboard.student', [
+                'user' => $user,
+                'initialTab' => $initialTab,
+                'availableTabs' => $availableTabs,
+                'unreadCount' => $unreadCount,
+            ]);
         }
 
         return view('dashboard.admin'); 

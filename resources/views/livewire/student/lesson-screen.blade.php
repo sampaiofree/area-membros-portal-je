@@ -1,253 +1,426 @@
-<section class="space-y-6 pb-32" x-data="{ showLessons: false, moreOpen: false }">
-    <header class="rounded-card bg-white p-5 shadow-card">
-        <p class="text-xs uppercase tracking-wide text-slate-500">{{ $course->title }}</p>
-        <h1 class="font-display text-3xl text-edux-primary">{{ $lesson->title }}</h1>
-        <div class="mt-2 flex flex-wrap items-center justify-between gap-3 text-sm text-slate-500">
-            <span>Modulo {{ $lesson->module->position }} / Aula {{ $lesson->position }}</span>
-            <span class="font-semibold text-edux-primary">{{ $progressPercent }}% concluido</span>
+{{-- resources/views/livewire/student/lesson-screen.blade.php --}}
+<div x-data="{ 
+    showLessons: false, 
+    showPayment: @entangle('showPaymentModal'),
+    videoReady: false 
+}" class="min-h-screen bg-gray-50 pb-6">
+
+    {{-- Header compacto e informativo --}}
+    <header class="sticky top-0 z-30 bg-white shadow-sm border-b">
+        <div class="max-w-4xl mx-auto px-4 py-3">
+            <div class="flex items-center justify-between gap-3">
+                <div class="flex-1 min-w-0">
+                    <p class="text-xs text-gray-500 truncate">{{ $course->title }}</p>
+                    <h1 class="text-lg font-bold text-gray-900 truncate">{{ $lesson->title }}</h1>
+                </div>
+                <div class="flex items-center gap-2 shrink-0">
+                    <span class="text-xs font-semibold text-blue-600 bg-blue-50 px-3 py-1.5 rounded-full">
+                        {{ $progressPercent }}%
+                    </span>
+                    <button @click="showLessons = true" 
+                            class="flex items-center gap-1 px-2 py-2 hover:bg-gray-100 rounded-lg transition-colors whitespace-nowrap"
+                            aria-label="Ver todas as aulas">
+                        <svg class="w-5 h-5 text-gray-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 4.5v15m6-15v15m-11-3.5h16M4.72 19.228A2.04 2.04 0 015.5 19h13a2.04 2.04 0 01.78.228m-14.667-11.667A2.04 2.04 0 015.5 5h13a2.04 2.04 0 01.78.228m0 0A2.001 2.001 0 0021 7v10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h14a2 2 0 012 2z"/> 
+                        </svg>
+                        <span class="text-xs font-medium">Aulas</span>
+                    </button>
+                </div>
+            </div>
         </div>
     </header>
 
-    <div class="rounded-card bg-black shadow-card">
-        @if ($this->youtubeId)
-            <div class="plyr__video-embed" id="lesson-player">
-                <iframe src="https://www.youtube.com/embed/{{ $this->youtubeId }}?modestbranding=1&rel=0" allowfullscreen allow="autoplay"></iframe>
-            </div>
-        @elseif ($lesson->video_url)
-            <iframe class="h-64 w-full rounded-card md:h-[420px]" src="{{ $lesson->video_url }}" allowfullscreen loading="lazy"></iframe>
-        @elseif ($lesson->content)
-            <div class="rounded-card bg-white p-6 text-slate-700">
-                {!! nl2br(e($lesson->content)) !!}
-            </div>
-        @else
-            <div class="rounded-card bg-white p-6 text-slate-700">
-                Conteudo desta aula sera disponibilizado em breve.
+    <main class="max-w-4xl mx-auto px-4 py-4 space-y-4">
+        
+        {{-- Player de vídeo otimizado (com Plyr) --}}
+        <div class="relative bg-black rounded-xl overflow-hidden shadow-lg">
+            @if ($this->youtubeId)
+                <div class="aspect-video">
+                    <div class="plyr__video-embed" id="lesson-player">
+                        <iframe 
+                            src="https://www.youtube.com/embed/{{ $this->youtubeId }}?modestbranding=1&rel=0&enablejsapi=1" 
+                            allowfullscreen 
+                            allow="autoplay; encrypted-media">
+                        </iframe>
+                    </div>
+                </div>
+            @elseif ($lesson->video_url)
+                <div class="aspect-video">
+                    {{-- Para vídeos que não são YouTube, podemos ter um iframe direto ou configurar o Plyr para aceitar outras URLs --}}
+                    {{-- Por simplicidade, vou manter o iframe direto aqui, mas Plyr pode ser configurado para ele também --}}
+                    <iframe 
+                        class="w-full h-full" 
+                        src="{{ $lesson->video_url }}" 
+                        allowfullscreen 
+                        loading="lazy">
+                    </iframe>
+                </div>
+            @elseif ($lesson->content)
+                <div class="bg-white p-6 text-gray-800 leading-relaxed">
+                    {!! nl2br(e($lesson->content)) !!}
+                </div>
+            @else
+                <div class="aspect-video flex items-center justify-center bg-gray-100 text-gray-600">
+                    <div class="text-center p-6">
+                        <svg class="w-16 h-16 mx-auto mb-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                        </svg>
+                        <p class="font-medium">Aula em breve</p>
+                        <p class="text-sm mt-1">O conteúdo será liberado em breve</p>
+                    </div>
+                </div>
+            @endif
+        </div>
+
+        {{-- Alertas --}}
+        @if ($statusMessage)
+            <div class="bg-green-50 border-l-4 border-green-500 p-4 rounded-lg">
+                <div class="flex items-start gap-3">
+                    <svg class="w-5 h-5 text-green-600 shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                    </svg>
+                    <p class="text-sm text-green-800 font-medium">{{ $statusMessage }}</p>
+                </div>
             </div>
         @endif
-    </div>
 
-    @if ($statusMessage)
-        <div class="rounded-2xl border-l-4 border-emerald-500 bg-emerald-50 p-4 text-emerald-800 shadow-card">
-            {{ $statusMessage }}
+        @if ($errorMessage)
+            <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-lg">
+                <div class="flex items-start gap-3">
+                    <svg class="w-5 h-5 text-red-600 shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                    </svg>
+                    <p class="text-sm text-red-800 font-medium">{{ $errorMessage }}</p>
+                </div>
+            </div>
+        @endif
+
+        {{-- Informações da aula --}}
+        <div class="bg-white rounded-xl p-4 shadow-sm">
+            <div class="flex items-center justify-between text-sm text-gray-600 mb-3">
+                <span>📚 Módulo {{ $lesson->module->position }}</span>
+                <span>📝 Aula {{ $lesson->position }}</span>
+            </div>
+            <p class="text-base font-medium text-gray-900">{{ $lesson->title }}</p>
         </div>
-    @endif
 
-    @if ($errorMessage)
-        <div class="rounded-2xl border-l-4 border-red-500 bg-red-50 p-4 text-red-800 shadow-card">
-            {{ $errorMessage }}
-        </div>
-    @endif
+        {{-- Ação principal: Marcar como concluída --}}
+        @unless ($isCompleted)
+            <button 
+                type="button" 
+                wire:click="completeLesson" 
+                wire:loading.attr="disabled"
+                class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-4 px-6 rounded-xl shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+                <span wire:loading.remove wire:target="completeLesson" class="flex items-center justify-center gap-2">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                    </svg>
+                    Marcar aula como concluída
+                </span>
+                <span wire:loading wire:target="completeLesson" class="flex items-center justify-center gap-2">
+                    <svg class="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Salvando...
+                </span>
+            </button>
+        @else
+            <div class="bg-green-50 border-2 border-green-200 rounded-xl p-4 text-center">
+                <div class="flex items-center justify-center gap-2 text-green-700">
+                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                    </svg>
+                    <span class="font-bold text-lg">Aula concluída!</span>
+                </div>
+            </div>
+        @endunless
 
-    <div class="rounded-card bg-white p-6 shadow-card space-y-5">
+        {{-- Navegação entre aulas --}}
         <div class="grid grid-cols-2 gap-3">
             @if ($previousLesson)
-                <a href="{{ route('learning.courses.lessons.show', [$course, $previousLesson]) }}" class="edux-btn flex h-full items-center justify-center gap-2 bg-white text-edux-primary">
-                    <span aria-hidden="true">&larr;</span>
-                    <span class="text-sm font-semibold">Aula anterior</span>
+                <a href="{{ route('learning.courses.lessons.show', [$course, $previousLesson]) }}" 
+                   class="flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-gray-700 font-semibold py-3 px-4 rounded-xl border-2 border-gray-200 transition-all">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                    </svg>
+                    <span>Anterior</span>
                 </a>
-            @endif
-            @if ($nextLesson)
-                <a href="{{ route('learning.courses.lessons.show', [$course, $nextLesson]) }}" class="edux-btn flex h-full items-center justify-center gap-2">
-                    <span class="text-sm font-semibold">Proxima aula</span>
-                    <span aria-hidden="true">&rarr;</span>
-                </a>
-            @endif
-        </div>
-
-        <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-            @unless ($isCompleted)
-                <button type="button" wire:click="completeLesson" wire:loading.attr="disabled" class="edux-btn aspect-square w-full text-sm font-semibold flex items-center justify-center text-center">
-                    <span wire:loading.remove wire:target="completeLesson">Marcar como concluida</span>
-                    <span wire:loading wire:target="completeLesson">Salvando...</span>
-                </button>
             @else
-                <div class="flex aspect-square w-full items-center justify-center rounded-2xl border border-emerald-200 bg-emerald-50 px-3 text-center text-sm font-semibold text-emerald-700">
-                    Aula concluida
-                </div>
-            @endunless
+                <div></div>
+            @endif
 
-            <button type="button" class="edux-btn aspect-square flex w-full items-center justify-center bg-white text-edux-primary text-sm font-semibold text-center" @click="showLessons = true">
-                Lista de aulas
-            </button>
+            @if ($nextLesson)
+                <a href="{{ route('learning.courses.lessons.show', [$course, $nextLesson]) }}" 
+                   class="flex items-center justify-center gap-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-4 rounded-xl shadow-md transition-all">
+                    <span>Próxima</span>
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                </a>
+            @else
+                <div></div>
+            @endif
+        </div>
 
-            @if ($course->finalTest)
-                <a href="{{ route('learning.courses.final-test.intro', $course) }}" class="edux-btn aspect-square flex w-full items-center justify-center bg-white text-edux-primary text-sm font-semibold text-center">
-                    Ir para o teste final
+        {{-- Ações secundárias --}}
+        <div class="space-y-3">
+            {{-- Teste final --}}
+            @if ($course->finalTest && $progressPercent >= 80)
+                <a href="{{ route('learning.courses.final-test.intro', $course) }}" 
+                   class="flex items-center justify-between bg-purple-50 hover:bg-purple-100 border-2 border-purple-200 text-purple-700 font-semibold py-4 px-5 rounded-xl transition-all">
+                    <div class="flex items-center gap-3">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
+                        <span>Fazer teste final</span>
+                    </div>
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
                 </a>
             @endif
 
-            <button type="button" wire:click="requestCertificate" wire:loading.attr="disabled" @class([
-                'edux-btn aspect-square flex w-full items-center justify-center text-sm font-semibold text-center',
-                'opacity-70' => ! $hasPaidCertificate,
-            ]) @disabled(! $hasPaidCertificate)>
-                <span wire:loading.remove wire:target="requestCertificate">Receber certificado</span>
-                <span wire:loading wire:target="requestCertificate">Gerando...</span>
-            </button>
+            {{-- Certificado --}}
+            @if ($hasPaidCertificate && $progressPercent >= 100)
+                <button 
+                    type="button"
+                    wire:click="requestCertificate" 
+                    wire:loading.attr="disabled"
+                    class="w-full flex items-center justify-between bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-bold py-4 px-5 rounded-xl shadow-md transition-all disabled:opacity-50">
+                    <div class="flex items-center gap-3">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/>
+                        </svg>
+                        <span wire:loading.remove wire:target="requestCertificate">Pegar meu certificado</span>
+                        <span wire:loading wire:target="requestCertificate">Gerando...</span>
+                    </div>
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                </button>
+
+                @if ($canRename)
+                    <p class="text-center text-sm text-gray-600">
+                        Nome errado? 
+                        <a href="{{ route('account.edit') }}" class="font-semibold text-blue-600 underline">
+                            Corrigir aqui
+                        </a>
+                    </p>
+                @endif
+            @elseif (!$hasPaidCertificate && $progressPercent >= 100)
+                <div class="bg-yellow-50 border-2 border-yellow-200 rounded-xl p-4">
+                    <div class="flex items-start gap-3">
+                        <svg class="w-6 h-6 text-yellow-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                        </svg>
+                        <div class="flex-1">
+                            <p class="font-bold text-yellow-800 mb-1">Certificado disponível!</p>
+                            <p class="text-sm text-yellow-700 mb-3">
+                                Você concluiu o curso! Para pegar seu certificado, finalize o pagamento.
+                            </p>
+                            <button 
+                                @click="showPayment = true"
+                                class="inline-flex items-center gap-2 bg-yellow-500 hover:bg-yellow-600 text-white font-semibold px-4 py-2 rounded-lg transition-colors">
+                                Ver opções de pagamento
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            @endif
         </div>
 
-        @if (! $hasPaidCertificate)
-            <p class="text-center text-xs text-amber-600">Finalize o pagamento do certificado antes de emitir. Consulte a aba de suporte.</p>
-        @endif
+        {{-- Voltar ao início --}}
+        <!--<a href="{{ route('dashboard') }}" 
+           class="flex items-center justify-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-3 px-4 rounded-xl transition-all">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+            </svg>
+            <span>Voltar para meus cursos</span>
+        </a>-->
+    </main>
 
-        @if ($canRename)
-            <small class="block text-center text-sm text-slate-500">
-                Nome incorreto? <a href="{{ route('account.edit') }}" class="font-semibold text-edux-primary underline">Atualize aqui</a>.
-            </small>
-        @endif
-    </div>
-
-    <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4" x-show="showLessons" x-transition>
-        <article class="w-full max-w-2xl rounded-card bg-white p-6 shadow-card">
-            <div class="mb-4 flex items-center justify-between">
-                <h2 class="font-display text-2xl text-edux-primary">Mapa do curso</h2>
-                <button class="text-slate-500" @click="showLessons = false">&times;</button>
+    {{-- Modal: Lista de aulas (melhorado) --}}
+    <div x-show="showLessons" 
+         x-transition.opacity
+         @click="showLessons = false"
+         class="fixed inset-0 z-50 bg-black/60 flex items-end sm:items-center justify-center p-0 sm:p-4">
+        <div @click.stop 
+             x-transition:enter="transition ease-out duration-200"
+             x-transition:enter-start="translate-y-full sm:translate-y-0 sm:scale-95"
+             x-transition:enter-end="translate-y-0 sm:scale-100"
+             class="bg-white w-full sm:max-w-2xl sm:rounded-2xl rounded-t-3xl max-h-[90vh] flex flex-col shadow-2xl">
+            
+            {{-- Header do modal --}}
+            <div class="flex items-center justify-between p-5 border-b bg-gray-50 sm:rounded-t-2xl rounded-t-3xl sticky top-0">
+                <h2 class="text-xl font-bold text-gray-900">Todas as aulas</h2>
+                <button @click="showLessons = false" 
+                        class="p-2 hover:bg-gray-200 rounded-lg transition-colors">
+                    <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
             </div>
-            <div class="max-h-[70vh] space-y-4 overflow-y-auto pr-2">
+
+            {{-- Lista de módulos e aulas --}}
+            <div class="overflow-y-auto p-4 space-y-3">
                 @foreach ($course->modules as $module)
-                    <div class="rounded-2xl border border-edux-line/70 p-4" x-data="{ open: {{ $module->id === $lesson->module_id ? 'true' : 'false' }} }">
-                        <button type="button" class="flex w-full items-center justify-between text-left font-semibold text-slate-700" @click="open = !open">
-                            <span>Modulo {{ $module->position }} - {{ $module->title }}</span>
-                            <svg class="h-5 w-5 text-edux-primary transition" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 9l-7 7-7-7" />
+                    <div x-data="{ open: {{ $module->id === $lesson->module_id ? 'true' : 'false' }} }" 
+                         class="bg-white border-2 rounded-xl overflow-hidden"
+                         :class="open ? 'border-blue-200' : 'border-gray-200'">
+                        
+                        {{-- Cabeçalho do módulo --}}
+                        <button @click="open = !open" 
+                                class="w-full flex items-center justify-between p-4 hover:bg-gray-50 transition-colors">
+                            <div class="flex items-center gap-3 text-left">
+                                <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center shrink-0">
+                                    <span class="font-bold text-blue-600">{{ $module->position }}</span>
+                                </div>
+                                <span class="font-semibold text-gray-900">{{ $module->title }}</span>
+                            </div>
+                            <svg class="w-5 h-5 text-gray-400 transition-transform" 
+                                 :class="open ? 'rotate-180' : ''" 
+                                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                             </svg>
                         </button>
-                        <ul class="mt-3 space-y-2 text-sm" x-show="open" x-collapse>
-                            @foreach ($module->lessons as $moduleLesson)
-                                @php
-                                    $completed = in_array($moduleLesson->id, $completedLessonIds, true);
-                                    $isActive = $moduleLesson->id === $lesson->id;
-                                @endphp
-                                <li>
-                                    <a href="{{ route('learning.courses.lessons.show', [$course, $moduleLesson]) }}"
-                                        @class([
-                                            'flex items-center justify-between rounded-xl border px-4 py-2 transition',
-                                            'border-edux-primary bg-edux-background font-semibold' => $isActive,
-                                            'border-edux-line hover:border-edux-primary/60' => ! $isActive,
-                                        ])>
-                                        <span>{{ $moduleLesson->position }}. {{ $moduleLesson->title }}</span>
-                                        @if ($completed)
-                                            <span class="text-emerald-500">&#10003;</span>
-                                        @endif
-                                    </a>
-                                </li>
-                            @endforeach
-                        </ul>
+
+                        {{-- Lista de aulas do módulo --}}
+                        <div x-show="open" 
+                             x-collapse
+                             class="border-t border-gray-200">
+                            <ul class="divide-y divide-gray-100">
+                                @foreach ($module->lessons as $moduleLesson)
+                                    @php
+                                        $completed = in_array($moduleLesson->id, $completedLessonIds, true);
+                                        $isActive = $moduleLesson->id === $lesson->id;
+                                    @endphp
+                                    <li>
+                                        <a href="{{ route('learning.courses.lessons.show', [$course, $moduleLesson]) }}"
+                                           @class([
+                                               'flex items-center justify-between p-4 hover:bg-gray-50 transition-colors',
+                                               'bg-blue-50' => $isActive,
+                                           ])>
+                                            <div class="flex items-center gap-3 flex-1 min-w-0">
+                                                <span class="text-sm font-medium text-gray-500 shrink-0">
+                                                    {{ $moduleLesson->position }}
+                                                </span>
+                                                <span @class([
+                                                    'text-sm truncate',
+                                                    'font-bold text-blue-600' => $isActive,
+                                                    'text-gray-700' => !$isActive,
+                                                ])>
+                                                    {{ $moduleLesson->title }}
+                                                </span>
+                                            </div>
+                                            @if ($completed)
+                                                <svg class="w-5 h-5 text-green-500 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                                </svg>
+                                            @elseif ($isActive)
+                                                <div class="w-2 h-2 bg-blue-500 rounded-full shrink-0"></div>
+                                            @endif
+                                        </a>
+                                    </li>
+                                @endforeach
+                            </ul>
+                        </div>
                     </div>
                 @endforeach
             </div>
-        </article>
+        </div>
     </div>
 
-    @php
-        $navIsCourses = request()->routeIs('learning.courses.*');
-        $navIsHome = request()->routeIs('dashboard');
-    @endphp
-    <nav class="fixed inset-x-0 bottom-0 z-40 pb-4" x-cloak>
-        <div class="relative mx-auto max-w-3xl px-4" @click.away="moreOpen = false">
-            <div class="flex items-center justify-between gap-2 rounded-3xl bg-white px-4 py-3 shadow-xl">
-                <a href="{{ route('dashboard') }}" @class([
-                    'flex-1 flex flex-col items-center gap-1',
-                    'text-[#1A73E8]' => $navIsHome,
-                    'text-[#555]' => ! $navIsHome,
-                ])>
-                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M3 9.75L12 4l9 5.75V20a1 1 0 01-1 1h-5.5v-5.5h-5V21H4a1 1 0 01-1-1V9.75z" />
-                    </svg>
-                    <span class="text-[11px] font-semibold">Home</span>
-                </a>
-                <a href="{{ route('dashboard', ['tab' => 'cursos']) }}" @class([
-                    'flex-1 flex flex-col items-center gap-1',
-                    'text-[#1A73E8]' => $navIsCourses,
-                    'text-[#555]' => ! $navIsCourses,
-                ])>
-                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M4.5 6.75h15M4.5 12h15M4.5 17.25h8.25" />
-                    </svg>
-                    <span class="text-[11px] font-semibold">Cursos</span>
-                </a>
-                <button type="button" @click="moreOpen = !moreOpen" :class="moreOpen ? 'text-[#1A73E8]' : 'text-[#555]'" class="flex flex-1 flex-col items-center gap-1 focus:outline-none">
-                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M5 12h.01M12 12h.01M19 12h.01" />
-                    </svg>
-                    <span class="text-[11px] font-semibold">Mais</span>
-                </button>
-            </div>
-
-            <div x-show="moreOpen" x-transition x-cloak class="absolute bottom-full left-0 right-0 mb-2 space-y-2 rounded-2xl bg-white p-3 shadow-lg">
-                <a href="{{ route('dashboard', ['tab' => 'vitrine']) }}" class="flex w-full items-center justify-between rounded-xl px-3 py-2 text-sm font-semibold text-[#555] hover:bg-gray-50">
-                    <span>Vitrine</span>
-                    <span class="text-xs text-[#1A73E8]">Ver</span>
-                </a>
-                <a href="{{ route('dashboard', ['tab' => 'notificacoes']) }}" class="flex w-full items-center justify-between rounded-xl px-3 py-2 text-sm font-semibold text-[#555] hover:bg-gray-50">
-                    <span>Notificacoes</span>
-                    <span class="text-xs text-[#1A73E8]">Ver</span>
-                </a>
-                <a href="{{ route('dashboard', ['tab' => 'suporte']) }}" class="flex w-full items-center justify-between rounded-xl px-3 py-2 text-sm font-semibold text-[#555] hover:bg-gray-50">
-                    <span>Suporte</span>
-                    <span class="text-xs text-[#1A73E8]">Ver</span>
-                </a>
-                <a href="{{ route('dashboard', ['tab' => 'conta']) }}" class="flex w-full items-center justify-between rounded-xl px-3 py-2 text-sm font-semibold text-[#555] hover:bg-gray-50">
-                    <span>Minha conta</span>
-                    <span class="text-xs text-[#1A73E8]">Ver</span>
-                </a>
-            </div>
-        </div>
-    </nav>
-</section>
-
-@if ($showPaymentModal)
-    @php
-        $formattedPrice = $course->certificate_price ? number_format($course->certificate_price, 2, ',', '.') : null;
-    @endphp
-    <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
-        <div class="w-full max-w-lg space-y-4 rounded-3xl bg-white p-6 shadow-2xl">
-            <div class="flex items-start justify-between gap-3">
-                <div>
-                    <p class="text-xs uppercase tracking-wide text-edux-primary">Pagamento pendente</p>
-                    <h3 class="font-display text-2xl text-edux-primary">Finalize para liberar o certificado</h3>
+    {{-- Modal: Pagamento do certificado --}}
+    <div x-show="showPayment" 
+         x-transition.opacity
+         @click="showPayment = false"
+         class="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
+        <div @click.stop 
+             x-transition:enter="transition ease-out duration-200"
+             x-transition:enter-start="scale-95 opacity-0"
+             x-transition:enter-end="scale-100 opacity-100"
+             class="bg-white w-full max-w-md rounded-2xl shadow-2xl">
+            
+            <div class="p-6 space-y-4">
+                {{-- Header --}}
+                <div class="flex items-start justify-between gap-3">
+                    <div>
+                        <div class="flex items-center gap-2 mb-1">
+                            <svg class="w-6 h-6 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/>
+                            </svg>
+                            <h3 class="text-xl font-bold text-gray-900">Certificado</h3>
+                        </div>
+                        <p class="text-sm text-gray-600">Finalize o pagamento para liberar</p>
+                    </div>
+                    <button @click="showPayment = false" 
+                            class="p-2 hover:bg-gray-100 rounded-lg transition-colors shrink-0">
+                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
                 </div>
-                <button type="button" class="text-sm font-semibold text-slate-500 hover:text-edux-primary" wire:click="closePaymentModal">
-                    Fechar
-                </button>
-            </div>
-            <p class="text-sm text-slate-600">
-                Antes de emitir o certificado e necessario concluir o pagamento referente a este curso.
-                @if ($formattedPrice)
-                    O valor informado e de <strong>R$ {{ $formattedPrice }}</strong>.
-                @endif
-            </p>
-            <div class="flex flex-wrap gap-3">
-                @if ($course->certificate_payment_url)
-                    <a href="{{ $course->certificate_payment_url }}" target="_blank" rel="noopener" class="edux-btn">
-                        Ir para pagamento
-                    </a>
-                @endif
-                <button type="button" class="edux-btn bg-white text-edux-primary" wire:click="closePaymentModal">
-                    Entendi
-                </button>
-            </div>
-            @unless ($course->certificate_payment_url)
-                <p class="text-xs text-slate-500">
-                    Entre em contato com o suporte para receber o link de pagamento do certificado.
+
+                {{-- Conteúdo do modal --}}
+                <p class="text-sm text-gray-700">
+                    Para emitir seu certificado de conclusão deste curso, é necessário finalizar o pagamento.
+                    @if ($course->certificate_price > 0)
+                        O valor é de <strong>R$ {{ $course->certificate_price }}</strong>.
+                    @endif
                 </p>
-            @endunless
+
+                <div class="flex flex-col gap-3">
+                    @if ($course->certificate_payment_url)
+                        <a href="{{ $course->certificate_payment_url }}" 
+                           target="_blank" 
+                           rel="noopener" 
+                           class="w-full text-center bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-3 px-4 rounded-xl shadow-md transition-all">
+                            Ir para pagamento
+                        </a>
+                    @endif
+                    <button type="button" 
+                            @click="showPayment = false"
+                            class="w-full text-center bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-3 px-4 rounded-xl transition-all">
+                        Entendi
+                    </button>
+                </div>
+
+                @unless ($course->certificate_payment_url)
+                    <p class="text-xs text-gray-500 text-center">
+                        Não encontrou o link de pagamento? Entre em contato com o suporte para mais informações.
+                    </p>
+                @endunless
+            </div>
         </div>
     </div>
-@endif
+</div>
 
-@if ($this->youtubeId)
-    @push('styles')
+@push('styles')
+    @if ($this->youtubeId) {{-- Apenas carrega o CSS do Plyr se for um vídeo do YouTube --}}
         <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css">
-    @endpush
+    @endif
+@endpush
 
-    @push('scripts')
+@push('scripts')
+    @if ($this->youtubeId) {{-- Apenas carrega o JS do Plyr se for um vídeo do YouTube --}}
         <script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
         <script>
             document.addEventListener('DOMContentLoaded', () => {
-                if (window.Plyr) {
-                    new Plyr('#lesson-player', { youtube: { rel: 0, modestbranding: 1 } });
+                if (window.Plyr && document.getElementById('lesson-player')) {
+                    new Plyr('#lesson-player', { 
+                        youtube: { 
+                            rel: 0, 
+                            modestbranding: 1,
+                            // O autoplay é problemático em muitos navegadores, mas você pode tentar aqui
+                            // autoplay: 0, 
+                        } 
+                    });
                 }
             });
         </script>
-    @endpush
-@endif
+    @endif
+@endpush
