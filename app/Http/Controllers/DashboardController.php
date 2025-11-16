@@ -15,6 +15,6 @@ class DashboardController extends Controller
             return view('dashboard.student', ['user' => $user]);
         }
 
-        return view('dashboard.admin');
+        return view('dashboard.admin'); 
     }
 }

@@ -14,6 +14,11 @@ use App\Http\Controllers\StudentFinalTestController;
 
 use Illuminate\Support\Facades\Route;
 
+Route::view('design', 'design.student-preview')->name('design.student.preview');
+Route::view('design/student-dashboard', 'student.dashboard')->name('design.student.dashboard');
+Route::view('design/student-courses', 'student.courses')->name('design.student.courses');
+
+
 Route::redirect('/', '/dashboard');
 Route::get('/certificates/verify/{token}', PublicCertificateController::class)->name('certificates.verify');
 Route::get('/catalogo/{course:slug}', PublicCoursePageController::class)->name('courses.public.show');
@@ -28,7 +33,7 @@ Route::post('/logout', [AuthController::class, 'destroy'])
     ->name('logout');
 
 Route::middleware('auth')->group(function (): void {
-    Route::get('/dashboard', DashboardController::class)->name('dashboard');
+    Route::get('/dashboard', DashboardController::class)->name('dashboard'); 
     Route::view('/conta', 'account.profile')->name('account.edit');
 
     Route::middleware('role:admin,teacher')->group(function (): void {
@@ -71,7 +76,7 @@ Route::middleware('auth')->group(function (): void {
         ->group(function (): void {
             Route::get('courses/{course:slug}', [StudentCourseController::class, 'redirectToNextLesson'])
                 ->name('courses.show');
-            Route::get('courses/{course:slug}/lessons/{lesson}', [StudentCourseController::class, 'lesson'])
+            Route::get('courses/{course:slug}/lessons/{lesson}', [StudentCourseController::class, 'lesson']) 
                 ->name('courses.lessons.show');
             Route::post('courses/{course:slug}/lessons/{lesson}/complete', [LessonProgressController::class, 'store'])
                 ->name('courses.lessons.complete');

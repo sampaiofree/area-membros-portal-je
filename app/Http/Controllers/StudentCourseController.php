@@ -38,7 +38,7 @@ class StudentCourseController extends Controller
 
         abort_if($lesson->module->course_id !== $course->id, 404);
 
-        return view('learning.lesson', [
+        return view('learning.lesson', [ 
             'course' => $course,
             'lesson' => $lesson,
         ]);

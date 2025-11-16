@@ -420,3 +420,291 @@ Ao propor mudanças no design system:
 5. Atualize número de versão
 
 **Regra de ouro:** Mantenha consistência. Se algo não está no design system, não crie "do seu jeito" — proponha adição oficial primeiro.
+
+
+
+# Dashboard do Aluno — Diretrizes de UI
+
+> Versão 1.0 — focado em mobile, público classe C e D, app estilo Duolingo.
+
+---
+
+## 1. Objetivo
+
+* Ser **extremamente simples**.
+* Facilitar o acesso rápido a:
+
+  * Meus cursos
+  * Certificados
+  * Vitrine de cursos
+  * Notificações
+  * Duxes (moeda virtual)
+
+Nada de telas cheias. Poucas opções, muito claras.
+
+---
+
+## 2. Público
+
+* Classe C e D
+* Muitos com baixa escolaridade
+* Alguns têm dificuldade de leitura
+* Usam quase sempre **celular**, muitas vezes de tela pequena
+
+**Regra:**
+Sempre pense: “Uma pessoa cansada, no ônibus, entende isso em 2 segundos?”
+
+---
+
+## 3. Princípios de design
+
+1. **Mobile primeiro**
+
+   * Projetar tudo pensando em **tela de celular**.
+   * Só depois adaptar para desktop, se necessário.
+
+2. **Poucas opções por vez**
+
+   * Tela inicial com **no máximo 5 cards principais**.
+   * Navegação inferior com **4 ícones**.
+
+3. **Ícone + texto**
+
+   * Nunca só texto.
+   * Sempre ícone grande + texto curto.
+
+4. **Textos curtos**
+
+   * Frases simples.
+   * Sem termos difíceis.
+   * Evitar parágrafos grandes.
+
+5. **Foco na ação**
+
+   * Cada tela precisa deixar claro:
+
+     * “O que eu faço agora?”
+     * Ex.: “Continuar curso”, “Ver aulas”, “Comprar curso”.
+
+---
+
+## 4. Cores e tipografia (herdado do EduX)
+
+Usar sempre as cores oficiais:
+
+* Azul primário: `#1A73E8`
+* Amarelo CTA: `#FBC02D`
+* Fundo: `#F5F5F5`
+* Texto principal: `#333333`
+* Texto secundário: `#666666`
+* Preto: `#000000`
+
+Fontes:
+
+* Títulos: **Poppins**, bold
+* Textos: **Inter**, normal
+* Botões: **Inter**, bold
+
+**Regras:**
+
+* Fundo da app: sempre **cinza claro** (`#F5F5F5`).
+* Cards e blocos: fundo branco, com sombra leve.
+* Ação principal: botão **amarelo** com texto **preto**.
+
+---
+
+## 5. Estrutura da navegação
+
+### 5.1. Barra inferior (fixa)
+
+Sempre presente no app (exceto em tela de vídeo full screen):
+
+1. 🏠 **Home**
+2. 🎓 **Meus cursos**
+3. 🛒 **Vitrine**
+4. ☰ **Mais** (perfil, notificações, ajuda, sair)
+
+**Regras:**
+
+* Só **ícones** na barra inferior.
+* Ícone **ativo** em azul (`#1A73E8`).
+* Ícones inativos em cinza escuro.
+* Tamanho mínimo para toque: **48x48px**.
+
+---
+
+## 6. Tela inicial (Home do aluno)
+
+### 6.1. Layout
+
+* Título simples no topo: “Olá, [Nome]”
+* Subtexto curto: “Continue seus estudos”
+* Abaixo, **cards grandes**, 2 por linha:
+
+Cards padrão:
+
+1. 🎓 **Meus cursos**
+2. 📜 **Certificados**
+3. 🛒 **Vitrine**
+4. 🔔 **Notificações**
+5. 💰 **Meus duxes**
+
+### 6.2. Padrão de cards
+
+**Formato:**
+
+* Forma: **quadrado** ou levemente retangular
+* Lado: ~120–140px no mobile
+* Fundo: branco
+* Bordas: arredondadas (10–16px)
+* Sombra leve
+
+**Conteúdo do card:**
+
+* Ícone grande no topo (emoji ou SVG simples)
+* Título claro embaixo (máx. 2 palavras)
+
+Exemplos de texto:
+
+* “Meus cursos”
+* “Certificados”
+* “Ver vitrine”
+* “Alertas”
+* “Meus duxes”
+
+---
+
+## 7. Padrão de botões
+
+### 7.1. Estilo principal
+
+* Cor de fundo: **amarelo CTA** `#FBC02D`
+* Texto: **preto**
+* Fonte: Inter, bold, 16–18px
+* Altura mínima: **50px** (ideal 56px)
+* Bordas: arredondadas (10–14px)
+* Ícone opcional no início (👉, ▶, ✓)
+
+Exemplos de texto:
+
+* “Continuar curso”
+* “Ver aulas”
+* “Baixar certificado”
+* “Comprar com duxes”
+* “Ver mais cursos”
+
+### 7.2. Variantes
+
+* Secundário: borda azul, texto azul, fundo branco.
+* Perigo (casos raros, ex: sair da conta): fundo vermelho claro, texto branco.
+
+---
+
+## 8. Ícones padrão (sem frescura)
+
+Usar sempre os mesmos ícones para manter hábito visual:
+
+* Home: 🏠
+* Meus cursos: 🎓
+* Certificados: 📜
+* Vitrine: 🛒
+* Notificações: 🔔
+* Perfil: 👤
+* Ajuda / suporte: ❓
+* Configurações: ⚙️
+* Duxes (moeda): 💰
+
+Se depois criar um ícone gráfico próprio para “Duxes”, manter o mesmo conceito: **moeda simples, fácil de reconhecer**.
+
+---
+
+## 9. Textos padrão (microcopy)
+
+### 9.1. Títulos
+
+* “Meus cursos”
+* “Certificados”
+* “Vitrine de cursos”
+* “Notificações”
+* “Meus duxes”
+
+### 9.2. Ações
+
+* “Continuar”
+* “Ver curso”
+* “Ver aulas”
+* “Recomeçar”
+* “Baixar certificado”
+* “Comprar curso”
+* “Usar duxes”
+
+### 9.3. Estados vazios
+
+* Sem cursos:
+
+  * “Você ainda não tem cursos.”
+  * Botão: “Ver cursos na vitrine”
+
+* Sem certificados:
+
+  * “Você ainda não concluiu nenhum curso.”
+  * Botão: “Ver seus cursos”
+
+* Sem notificações:
+
+  * “Você não tem notificações.”
+
+---
+
+## 10. Estados importantes
+
+### 10.1. Carregando
+
+* Usar skeleton simples (blocos cinza) ou spinner bem leve.
+* Texto curto: “Carregando…”
+
+### 10.2. Erro
+
+* Mensagem simples:
+
+  * “Algo deu errado.”
+  * “Tente novamente em alguns segundos.”
+* Botão: “Tentar de novo”
+
+### 10.3. Sem internet
+
+* Ícone simples (ex: 📶 com X).
+* Texto:
+
+  * “Sem conexão”
+  * “Verifique sua internet”
+
+---
+
+## 11. Acessibilidade mínima
+
+* Tamanho mínimo do texto: **14px**, ideal **16px+**.
+* Tocar em qualquer botão deve ser fácil (área grande).
+* Não usar textos muito claros em fundos claros.
+* Evitar parágrafos longos.
+
+---
+
+## 12. Checklist para qualquer tela do aluno
+
+Antes de aprovar uma tela da área do aluno, verificar:
+
+1. [ ] Fundo cinza claro (`#F5F5F5`)
+2. [ ] No máximo 2 colunas
+3. [ ] Ícones grandes e claros
+4. [ ] Textos curtos e simples
+5. [ ] Botões amarelos para ações principais
+6. [ ] Navegação inferior com 4 ícones
+7. [ ] Espaço em branco suficiente (nada apertado)
+8. [ ] Pensado primeiro para celular
+
+---
+
+**Regra final:**
+
+> Se uma pessoa que não gosta de estudar e não entende de tecnologia abrir o app e, **em 3 segundos**, conseguir achar “Meus cursos” e “Continuar”, a interface está certa.

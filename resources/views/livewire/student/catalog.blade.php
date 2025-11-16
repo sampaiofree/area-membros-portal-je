@@ -18,6 +18,7 @@
             <article class="rounded-card bg-white shadow-card overflow-hidden flex flex-col">
                 @if ($course->coverImageUrl())
                     <img src="{{ $course->coverImageUrl() }}" alt="{{ $course->title }}" class="h-40 w-full object-cover">
+                @endif
                 @php
                     $coverUrl = $course->coverImageUrl() ?? $defaultCourseCover;
                 @endphp

@@ -1,48 +1,51 @@
 <section class="space-y-6">
-    <div class="rounded-card bg-white p-6 shadow-card">
-        <p class="text-sm uppercase tracking-wide text-edux-primary">Bem-vindo</p>
-        <h1 class="font-display text-3xl text-edux-primary">Olá, {{ $user->preferredName() }}!</h1>
-        <p class="text-slate-600 text-sm">Confira abaixo o status das suas matrículas e os certificados disponíveis.</p>
-        <div class="mt-6 grid gap-4 md:grid-cols-3">
-            <div class="rounded-2xl border border-edux-line/70 bg-edux-background px-4 py-5 text-center">
-                <p class="text-xs uppercase text-slate-500">Matrículas</p>
-                <p class="mt-2 text-3xl font-display text-edux-primary">{{ $totalEnrollments }}</p>
-            </div>
-            <div class="rounded-2xl border border-edux-line/70 bg-edux-background px-4 py-5 text-center">
-                <p class="text-xs uppercase text-slate-500">Concluídos</p>
-                <p class="mt-2 text-3xl font-display text-emerald-600">{{ $completed }}</p>
-            </div>
-            <div class="rounded-2xl border border-edux-line/70 bg-edux-background px-4 py-5 text-center">
-                <p class="text-xs uppercase text-slate-500">Em andamento</p>
-                <p class="mt-2 text-3xl font-display text-amber-500">{{ $running }}</p>
-            </div>
+    <div class="mb-8">
+        <div class="grid grid-cols-2 gap-4 sm:grid-cols-3">
+            <a href="{{ route('dashboard', ['tab' => 'cursos']) }}" @click.prevent="$dispatch('set-tab', 'cursos')" class="flex flex-col items-center gap-2 rounded-2xl border border-edux-line/60 bg-white p-4 text-center shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+                <span class="flex h-10 w-10 items-center justify-center rounded-full bg-edux-background text-edux-primary">
+                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M4 6.75h16M4 12h16M6 17.25h8" />
+                    </svg>
+                </span>
+                <span class="text-sm font-semibold">Meus cursos</span>
+            </a>
+
+            <a href="{{ route('dashboard', ['tab' => 'vitrine']) }}" @click.prevent="$dispatch('set-tab', 'vitrine')" class="flex flex-col items-center gap-2 rounded-2xl border border-edux-line/60 bg-white p-4 text-center shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+                <span class="flex h-10 w-10 items-center justify-center rounded-full bg-edux-background text-edux-primary">
+                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M6 6h12l-1 12H7L6 6zM9 6V4a3 3 0 016 0v2" />
+                    </svg>
+                </span>
+                <span class="text-sm font-semibold">Vitrine</span>
+            </a>
+
+            <a href="{{ route('dashboard', ['tab' => 'notificacoes']) }}" @click.prevent="$dispatch('set-tab', 'notificacoes')" class="flex flex-col items-center gap-2 rounded-2xl border border-edux-line/60 bg-white p-4 text-center shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+                <span class="flex h-10 w-10 items-center justify-center rounded-full bg-edux-background text-edux-primary">
+                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M15 17h5l-1.4-1.4A2 2 0 0118 14.172V11a6 6 0 10-12 0v3.172a2 2 0 01-.586 1.414L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                    </svg>
+                </span>
+                <span class="text-sm font-semibold">Notificacoes</span>
+            </a>
+
+            <a href="{{ route('dashboard', ['tab' => 'suporte']) }}" @click.prevent="$dispatch('set-tab', 'suporte')" class="flex flex-col items-center gap-2 rounded-2xl border border-edux-line/60 bg-white p-4 text-center shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+                <span class="flex h-10 w-10 items-center justify-center rounded-full bg-edux-background text-edux-primary">
+                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M12 21l-8-4.5V7.5L12 3l8 4.5v9L12 21z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M12 11v2m0-6v.01" />
+                    </svg>
+                </span>
+                <span class="text-sm font-semibold">Suporte</span>
+            </a>
+
+            <a href="{{ route('dashboard', ['tab' => 'conta']) }}" @click.prevent="$dispatch('set-tab', 'conta')" class="flex flex-col items-center gap-2 rounded-2xl border border-edux-line/60 bg-white p-4 text-center shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+                <span class="flex h-10 w-10 items-center justify-center rounded-full bg-edux-background text-edux-primary">
+                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M12 12a4 4 0 100-8 4 4 0 000 8zM4.5 20a7.5 7.5 0 0115 0" />
+                    </svg>
+                </span>
+                <span class="text-sm font-semibold">Conta</span>
+            </a>
         </div>
     </div>
-
-    @if ($pendingCertificates->isNotEmpty())
-        <div class="rounded-card border border-amber-200 bg-amber-50 p-6 shadow-card space-y-3">
-            <div>
-                <p class="text-sm uppercase tracking-wide text-amber-600">Certificados pendentes</p>
-                <p class="text-slate-700">Você concluiu {{ $pendingCertificates->count() }} curso(s) mas ainda não emitiu o certificado. Lembre-se de confirmar o pagamento antes de emitir.</p>
-            </div>
-            <div class="space-y-3">
-                @foreach ($pendingCertificates as $enrollment)
-                    <div class="rounded-2xl border border-amber-200 bg-white px-4 py-3 flex items-center justify-between flex-wrap gap-3">
-                        <div>
-                            <p class="font-semibold text-edux-primary">{{ $enrollment->course->title }}</p>
-                            <p class="text-sm text-slate-500">Acesse o curso e emita o certificado.</p>
-                        </div>
-                        @php
-                            $firstLesson = $enrollment->course->modules->sortBy('position')->flatMap(fn ($module) => $module->lessons->sortBy('position'))->first();
-                        @endphp
-                        @if ($firstLesson)
-                            <a href="{{ route('learning.courses.lessons.show', [$enrollment->course, $firstLesson]) }}" class="edux-btn bg-white text-edux-primary">
-                                Emitir agora
-                            </a>
-                        @endif
-                    </div>
-                @endforeach
-            </div>
-        </div>
-    @endif
 </section>
