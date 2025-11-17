@@ -32,11 +32,9 @@ class LessonScreen extends Component
     public bool $canRename;
     public bool $hasPaidCertificate = false;
     public bool $showPaymentModal = false;
-    public ?int $duxEarnedAmount = null;
 
     private $user;
     private $enrollment;
-    private bool $shouldDispatchDuxEarned = false;
 
     public function mount(int $courseId, int $lessonId): void
     {
@@ -53,8 +51,6 @@ class LessonScreen extends Component
 
         $this->enrollment = $this->ensureEnrollment($this->user, $this->course);
         $this->canRename = $this->user->name_change_available ?? false;
-        $this->duxEarnedAmount = session()->pull('dux_earned_amount');
-        $this->shouldDispatchDuxEarned = (bool) $this->duxEarnedAmount;
 
         $this->refreshState();
     }
@@ -101,20 +97,27 @@ class LessonScreen extends Component
         $this->refreshState();
 
         try {
-            $earned = 1;
-
-            app(DuxWalletService::class)->applyRule($this->user, "lesson_completed", [
+            $transaction = app(DuxWalletService::class)->applyRule($this->user, "lesson_completed", [
                 "lesson_id" => $this->lesson->id,
                 "course_id" => $this->course->id,
             ]);
 
-            // dispara evento imediato e persiste para proxima navegao
-            $this->dispatch("dux-earned", ["amount" => $earned]);
+            $transaction->loadMissing('wallet');
+            $earned = (int) $transaction->amount;
+            $newBalance = $transaction->wallet?->balance ?? app(DuxWalletService::class)->walletFor($this->user)->balance;
+
+            // dispara evento imediato e persiste para proxima navegacao
+            $this->dispatch("dux-earned", [
+                "amount" => $earned,
+                "balance" => $newBalance,
+            ]);
+
             session()->flash('dux_earned_amount', $earned);
-            $this->duxEarnedAmount = null;
-            $this->shouldDispatchDuxEarned = false;
-        } catch (Throwable $e) {
-            // nao bloqueia fluxo se regra nao existir ou falhar
+            session()->flash('dux_balance', $newBalance);
+        } catch (RuntimeException $e) {
+            report($e);
+        } catch (\Throwable $e) {
+            report($e);
         }
 
         if ($nextLesson && $nextLesson->id !== $this->lesson->id) {
@@ -219,12 +222,6 @@ class LessonScreen extends Component
 
     public function render()
     {
-        if ($this->shouldDispatchDuxEarned && $this->duxEarnedAmount) {
-            $this->dispatch('dux-earned', ['amount' => $this->duxEarnedAmount]);
-            $this->duxEarnedAmount = null;
-            $this->shouldDispatchDuxEarned = false;
-        }
-
         return view('livewire.student.lesson-screen');
     }
 

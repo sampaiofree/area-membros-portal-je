@@ -49,10 +49,10 @@
                     <a href="{{ route('admin.users.index') }}" class="block rounded-xl border border-white/20 px-4 py-3 text-center">Usuarios</a>
                     <a href="{{ route('admin.identity') }}" class="block rounded-xl border border-white/20 px-4 py-3 text-center">Identidade</a>
                     <a href="{{ route('admin.dux.rules.index') }}" class="block rounded-xl border border-white/20 px-4 py-3 text-center">Regras Duxes</a>
-                    <a href="{{ route('admin.dux.packs.index') }}" class="block rounded-xl border border-white/20 px-4 py-3 text-center">Pacotes Duxes</a>
+                    <!--<a href="{{ route('admin.dux.packs.index') }}" class="block rounded-xl border border-white/20 px-4 py-3 text-center">Pacotes Duxes</a>-->
                     <a href="{{ route('admin.certificates.payments') }}" class="block rounded-xl border border-white/20 px-4 py-3 text-center">Pagamentos certificados</a>
                     <a href="{{ route('admin.notifications.index') }}" class="block rounded-xl border border-white/20 px-4 py-3 text-center">Notificacoes</a>
-                    <a href="{{ route('admin.users.create') }}" class="block rounded-xl border border-white/20 px-4 py-3 text-center">Novo usuario/professor</a>
+                    
                 @endif
             </nav>
         </div>
@@ -84,11 +84,11 @@
                         <li><a href="{{ route('admin.users.index') }}" class="block rounded-lg px-3 py-2 hover:bg-edux-background">Usuarios</a></li>
                         <li><a href="{{ route('admin.identity') }}" class="block rounded-lg px-3 py-2 hover:bg-edux-background">Identidade</a></li>
                         <li><a href="{{ route('admin.dux.rules.index') }}" class="block rounded-lg px-3 py-2 hover:bg-edux-background">Regras Duxes</a></li>
-                        <li><a href="{{ route('admin.dux.packs.index') }}" class="block rounded-lg px-3 py-2 hover:bg-edux-background">Pacotes Duxes</a></li>
+                        <!--<li><a href="{{ route('admin.dux.packs.index') }}" class="block rounded-lg px-3 py-2 hover:bg-edux-background">Pacotes Duxes</a></li>-->
                         <li><a href="{{ route('dashboard', ['tab' => 'cursos']) }}" class="block rounded-lg px-3 py-2 hover:bg-edux-background">Cursos cadastrados</a></li>
-                        <li><a href="{{ route('admin.certificates.payments') }}" class="block rounded-lg px-3 py-2 hover:bg-edux-background">Pagamentos certificados</a></li>
+                        <!--<li><a href="{{ route('admin.certificates.payments') }}" class="block rounded-lg px-3 py-2 hover:bg-edux-background">Pagamentos certificados</a></li>-->
                         <li><a href="{{ route('admin.notifications.index') }}" class="block rounded-lg px-3 py-2 hover:bg-edux-background">Notificacoes</a></li>
-                        <li><a href="{{ route('admin.users.create') }}" class="block rounded-lg px-3 py-2 hover:bg-edux-background">Novo usuario/professor</a></li>
+                        
                     </ul>
                 </aside>
             @endif
