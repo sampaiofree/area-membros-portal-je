@@ -9,6 +9,7 @@ class DuxPack extends Model
 {
     use HasFactory;
 
+    // Pacotes de venda de duxes (quantidade + preço).
     protected $fillable = [
         'name',
         'duxes',

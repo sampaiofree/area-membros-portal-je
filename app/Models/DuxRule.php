@@ -9,6 +9,7 @@ class DuxRule extends Model
 {
     use HasFactory;
 
+    // Regras que geram créditos/débitos de duxes, com condições e direção configuráveis.
     protected $fillable = [
         'name',
         'slug',

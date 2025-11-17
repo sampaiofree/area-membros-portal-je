@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Admin;
 
 use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
+use App\Models\DuxTransaction;
 use App\Models\User;
+use App\Services\DuxWalletService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -36,11 +38,20 @@ class UserController extends Controller
         return view('admin.users.index', compact('users', 'search'));
     }
 
-    public function edit(User $user): View
+    
+    public function edit(User $user, DuxWalletService $walletService): View
     {
+        $wallet = $walletService->walletFor($user);
+        $recentTransactions = DuxTransaction::where('wallet_id', $wallet->id)
+            ->latest()
+            ->limit(5)
+            ->get();
+
         return view('admin.users.edit', [
             'user' => $user,
             'roles' => UserRole::cases(),
+            'duxBalance' => $wallet->balance,
+            'recentTransactions' => $recentTransactions,
         ]);
     }
 
@@ -55,6 +66,9 @@ class UserController extends Controller
             'profile_photo' => ['nullable', 'image', 'max:2048'],
             'password' => ['nullable', 'string', 'min:8', 'confirmed'],
             'remove_photo' => ['nullable', 'boolean'],
+            'dux_amount' => ['nullable', 'integer', 'min:1'],
+            'dux_action' => ['nullable', Rule::in(['add', 'remove'])],
+            'dux_reason' => ['nullable', 'string', 'max:255'],
         ]);
 
         $user->fill([
@@ -84,6 +98,15 @@ class UserController extends Controller
         }
 
         $user->save();
+
+        if ($request->filled('dux_amount') && $request->filled('dux_action')) {
+            $amount = (int) $request->dux_amount;
+            $signed = $request->dux_action === 'add' ? $amount : -1 * $amount;
+            app(DuxWalletService::class)->adjust($user, $signed, 'admin_manual', [
+                'admin_id' => $request->user()->id,
+                'reason' => $request->input('dux_reason'),
+            ]);
+        }
 
         return redirect()
             ->route('admin.users.edit', $user)

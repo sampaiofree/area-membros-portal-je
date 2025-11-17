@@ -69,16 +69,21 @@ class DuxWalletService
 
     public function adjust(User $user, int $amount, string $source, array $meta = []): DuxTransaction
     {
-        return DB::transaction(function () use ($user, $amount, $source, $meta) {
+        $adminId = $meta['admin_id'] ?? null;
+        $reason = $meta['reason'] ?? null;
+
+        return DB::transaction(function () use ($user, $amount, $source, $meta, $adminId, $reason) {
             $wallet = $this->walletFor($user);
             $wallet->increment('balance', $amount);
 
             return DuxTransaction::create([
                 'wallet_id' => $wallet->id,
+                'admin_id' => $adminId,
                 'rule_id' => null,
                 'direction' => $amount >= 0 ? 'earn' : 'spend',
                 'amount' => $amount,
                 'source' => $source,
+                'reason' => $reason,
                 'meta' => $meta,
             ]);
         });

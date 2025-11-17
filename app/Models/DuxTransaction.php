@@ -9,12 +9,15 @@ class DuxTransaction extends Model
 {
     use HasFactory;
 
+    // Histórico de movimentações de duxes de uma carteira, vinculado a uma regra opcional e metadados.
     protected $fillable = [
         'wallet_id',
+        'admin_id',
         'rule_id',
         'direction',
         'amount',
         'source',
+        'reason',
         'meta',
     ];
 

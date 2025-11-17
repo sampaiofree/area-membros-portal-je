@@ -9,6 +9,7 @@ class DuxWallet extends Model
 {
     use HasFactory;
 
+    // Carteira de duxes por usuário. Guarda o saldo atual e expõe o histórico via transactions.
     protected $fillable = [
         'user_id',
         'balance',
