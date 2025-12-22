@@ -10,7 +10,6 @@ use Dompdf\Options;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use InvalidArgumentException;
-use Spatie\PdfToImage\Enums\OutputFormat;
 use Spatie\PdfToImage\Pdf as PdfToImage;
 use Throwable;
 
@@ -219,11 +218,10 @@ class CertificadoService
 
         try {
             $pdfToImage = new PdfToImage($disk->path($relativePdf));
-            $pdfToImage
-                ->selectPage(1)
-                ->format(OutputFormat::Png)
-                ->resolution($lowResolution ? 96 : 300);
-            $pdfToImage->save($disk->path($relativePng));
+            $pdfToImage->setPage(1);
+            $pdfToImage->setOutputFormat('png');
+            $pdfToImage->setResolution($lowResolution ? 144 : 300);
+            $pdfToImage->saveImage($disk->path($relativePng));
 
             if ($lowResolution) {
                 $this->decoratePreviewImage($disk->path($relativePng));
