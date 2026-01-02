@@ -49,18 +49,6 @@ class SystemIdentityController extends Controller
             'rule' => 'nullable|image|max:1024',
             'description' => 'Sugestão 800×400 px.',
         ],
-        'certificate_front' => [
-            'column' => 'default_certificate_front_path',
-            'label' => 'Fundo frente do certificado',
-            'rule' => 'nullable|image|max:2048',
-            'description' => 'Arte em A4 paisagem.',
-        ],
-        'certificate_back' => [
-            'column' => 'default_certificate_back_path',
-            'label' => 'Fundo verso do certificado',
-            'rule' => 'nullable|image|max:2048',
-            'description' => 'Arte em A4 paisagem.',
-        ],
     ];
 
     public function edit()

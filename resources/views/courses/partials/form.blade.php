@@ -52,9 +52,9 @@
             <label class="space-y-1 text-sm font-semibold text-slate-600">
                 <span>Responsável</span>
                 <select name="owner_id" class="w-full rounded-xl border border-edux-line px-4 py-3 focus:border-edux-primary focus:ring-edux-primary/30">
-                    @foreach ($teachers as $teacher)
-                        <option value="{{ $teacher->id }}" @selected(old('owner_id', $course->owner_id ?? $user->id) == $teacher->id)>
-                            {{ $teacher->name }} ({{ $teacher->role->label() }})
+                    @foreach ($owners as $owner)
+                        <option value="{{ $owner->id }}" @selected(old('owner_id', $course->owner_id ?? $user->id) == $owner->id)>
+                            {{ $owner->name }} ({{ $owner->role->label() }})
                         </option>
                     @endforeach
                 </select>
@@ -119,6 +119,6 @@
 
     <div class="flex flex-wrap gap-3">
         <button type="submit" class="edux-btn">{{ $isEdit ? 'Salvar alterações' : 'Criar curso' }}</button>
-        <a href="{{ route('dashboard') }}" class="edux-btn bg-white text-edux-primary">Cancelar</a>
+        <a href="{{ route('admin.dashboard') }}" class="edux-btn bg-white text-edux-primary">Cancelar</a>
     </div>
 </form>

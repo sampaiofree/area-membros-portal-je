@@ -65,8 +65,8 @@
                 <label class="space-y-2 text-sm font-semibold text-slate-600">
                     <span>Responsável</span>
                     <select wire:model.defer="owner_id" class="w-full rounded-xl border border-edux-line px-4 py-3 focus:border-edux-primary focus:ring-edux-primary/30">
-                        @foreach ($teachers as $teacher)
-                            <option value="{{ $teacher->id }}">{{ $teacher->name }} ({{ $teacher->role->label() }})</option>
+                        @foreach ($owners as $owner)
+                            <option value="{{ $owner->id }}">{{ $owner->name }} ({{ $owner->role->label() }})</option>
                         @endforeach
                     </select>
                     @error('owner_id') <span class="text-sm text-red-500">{{ $message }}</span> @enderror
@@ -108,7 +108,7 @@
             <button type="submit" class="edux-btn">
                 💾 {{ $course ? 'Salvar alterações' : 'Criar curso' }}
             </button>
-        <a href="{{ route('dashboard') }}" class="edux-btn bg-white text-edux-primary">Cancelar</a>
+        <a href="{{ route('admin.dashboard') }}" class="edux-btn bg-white text-edux-primary">Cancelar</a>
         </div>
     </form>
 </section>

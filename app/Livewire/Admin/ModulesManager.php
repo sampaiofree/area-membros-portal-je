@@ -212,14 +212,6 @@ class ModulesManager extends Component
     {
         $user = Auth::user();
 
-        if (! $user) {
-            return false;
-        }
-
-        if ($user->isAdmin()) {
-            return true;
-        }
-
-        return $user->isTeacher() && $this->course->owner_id === $user->id;
+        return $user && $user->isAdmin();
     }
 }

@@ -25,11 +25,6 @@ class DatabaseSeeder extends Seeder
                 'role' => UserRole::ADMIN,
             ],
             [
-                'name' => 'Professora Laura',
-                'email' => 'professora@edux.test',
-                'role' => UserRole::TEACHER,
-            ],
-            [
                 'name' => 'Aluno Diego',
                 'email' => 'aluno@edux.test',
                 'role' => UserRole::STUDENT,

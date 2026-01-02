@@ -33,11 +33,6 @@
                 <div class="text-4xl mb-2">🔔</div>
                 <span class="text-sm font-semibold">Notificações</span>
             </div>
-
-            <div class="bg-white rounded-xl shadow p-4 flex flex-col items-center justify-center col-span-2">
-                <div class="text-4xl mb-2">💰</div>
-                <span class="text-sm font-semibold">Meus Duxes</span>
-            </div>
         </div>
     </div>
 

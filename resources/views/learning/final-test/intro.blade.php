@@ -17,7 +17,7 @@
 
     @if ($finalTest->questions->isEmpty())
         <div class="card" style="background:#fee2e2; color:#b91c1c;">
-            Este teste ainda não possui questões disponíveis. Avise o seu professor.
+            Este teste ainda não possui questões disponíveis. Avise o administrador.
         </div>
     @else
         <form method="POST" action="{{ route('learning.courses.final-test.start', $course) }}" style="display:flex; flex-direction:column; gap:0.75rem;">

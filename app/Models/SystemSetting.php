@@ -17,8 +17,6 @@ class SystemSetting extends Model
         'default_course_cover_path',
         'default_module_cover_path',
         'default_lesson_cover_path',
-        'default_certificate_front_path',
-        'default_certificate_back_path',
         'certificate_title_size',
         'certificate_subtitle_size',
         'certificate_body_size',

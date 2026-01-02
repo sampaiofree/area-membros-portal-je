@@ -5,12 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\Course;
 use App\Models\Lesson;
 use App\Models\Enrollment;
-use App\Services\DuxWalletService;
 use App\Support\EnsuresStudentEnrollment;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
-use RuntimeException;
 
 class StudentCourseController extends Controller
 {
@@ -50,15 +48,6 @@ class StudentCourseController extends Controller
     public function enroll(Request $request, Course $course): RedirectResponse
     {
         $user = $request->user();
-        $wallet = app(DuxWalletService::class);
-
-        try {
-            $wallet->applyRule($user, 'enrollment', ['course_id' => $course->id]);
-        } catch (RuntimeException $e) {
-            return back()->with('error', $e->getMessage());
-        } catch (\Throwable $e) {
-            // se regra nao existir ou falhar silenciosamente, segue inscricao
-        }
 
         Enrollment::firstOrCreate([
             'course_id' => $course->id,

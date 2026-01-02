@@ -12,7 +12,15 @@ class EnsureUserHasRole
     {
         $user = $request->user();
 
-        if (! $user || ! in_array($user->role->value ?? $user->role, $roles, true)) {
+        if (! $user) {
+            abort(403);
+        }
+
+        if ($user->isAdmin()) {
+            return $next($request);
+        }
+
+        if (! in_array($user->role->value ?? $user->role, $roles, true)) {
             abort(403);
         }
 

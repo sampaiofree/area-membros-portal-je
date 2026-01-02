@@ -4,7 +4,15 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    @php
+        $settings = \App\Models\SystemSetting::current();
+        $faviconUrl = $settings->assetUrl('favicon_path');
+        $logoUrl = $settings->assetUrl('default_logo_dark_path');
+    @endphp
     <title>@yield('title', 'EduX')</title>
+    @if ($faviconUrl)
+        <link rel="icon" href="{{ $faviconUrl }}">
+    @endif
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
@@ -22,7 +30,13 @@
     <header class="bg-edux-primary text-white shadow-lg">
         <div class="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-4">
             <div class="flex items-center gap-3">
-                <span class="rounded-full bg-white/20 px-4 py-2 font-display text-xl tracking-wide">EduX</span>
+                <span class="flex items-center rounded-full bg-white/20 px-4 py-2 font-display text-xl tracking-wide">
+                    @if ($logoUrl)
+                        <img src="{{ $logoUrl }}" alt="EduX" class="h-8 w-auto">
+                    @else
+                        EduX
+                    @endif
+                </span>
                 @auth
                     <span class="text-sm opacity-80">{{ $user->preferredName() }} — {{ $user->role->label() }}</span>
                 @endauth
@@ -49,8 +63,6 @@
                     <a href="{{ route('admin.users.index') }}" class="block rounded-xl border border-white/20 px-4 py-3 text-center">Usuarios</a>
                     <a href="{{ route('admin.identity') }}" class="block rounded-xl border border-white/20 px-4 py-3 text-center">Identidade</a>
                     <a href="{{ route('certificates.branding.edit') }}" class="block rounded-xl border border-white/20 px-4 py-3 text-center">Certificados</a>
-                    <a href="{{ route('admin.dux.rules.index') }}" class="block rounded-xl border border-white/20 px-4 py-3 text-center">Regras Duxes</a>
-                    <!--<a href="{{ route('admin.dux.packs.index') }}" class="block rounded-xl border border-white/20 px-4 py-3 text-center">Pacotes Duxes</a>-->
                     <a href="{{ route('admin.certificates.payments') }}" class="block rounded-xl border border-white/20 px-4 py-3 text-center">Pagamentos certificados</a>
                     <a href="{{ route('admin.notifications.index') }}" class="block rounded-xl border border-white/20 px-4 py-3 text-center">Notificacoes</a>
                     
@@ -70,9 +82,7 @@
                         <li><a href="{{ route('admin.users.index') }}" class="block rounded-lg px-3 py-2 hover:bg-edux-background">Usuarios</a></li>
                         <li><a href="{{ route('admin.identity') }}" class="block rounded-lg px-3 py-2 hover:bg-edux-background">Identidade</a></li>
                         <li><a href="{{ route('certificates.branding.edit') }}" class="block rounded-lg px-3 py-2 hover:bg-edux-background">Certificados</a></li>
-                        <li><a href="{{ route('admin.dux.rules.index') }}" class="block rounded-lg px-3 py-2 hover:bg-edux-background">Regras Duxes</a></li>
-                        <!--<li><a href="{{ route('admin.dux.packs.index') }}" class="block rounded-lg px-3 py-2 hover:bg-edux-background">Pacotes Duxes</a></li>-->
-                        <li><a href="{{ route('dashboard', ['tab' => 'cursos']) }}" class="block rounded-lg px-3 py-2 hover:bg-edux-background">Cursos cadastrados</a></li>
+                        <li><a href="{{ route('admin.dashboard') }}" class="block rounded-lg px-3 py-2 hover:bg-edux-background">Cursos cadastrados</a></li>
                         <!--<li><a href="{{ route('admin.certificates.payments') }}" class="block rounded-lg px-3 py-2 hover:bg-edux-background">Pagamentos certificados</a></li>-->
                         <li><a href="{{ route('admin.notifications.index') }}" class="block rounded-lg px-3 py-2 hover:bg-edux-background">Notificacoes</a></li>
                         

@@ -24,7 +24,7 @@ class UserForm extends Component
 
     public function mount(): void
     {
-        $this->role = UserRole::TEACHER->value;
+        $this->role = UserRole::STUDENT->value;
     }
 
     public function save(): void
@@ -67,7 +67,7 @@ class UserForm extends Component
             'whatsapp',
             'profilePhoto',
         ]);
-        $this->role = UserRole::TEACHER->value;
+        $this->role = UserRole::STUDENT->value;
 
         $this->dispatch('user-created');
     }

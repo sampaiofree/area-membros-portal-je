@@ -83,10 +83,6 @@
                     <span class="text-xs font-semibold">Cursos</span>
                 </a>
                 <button type="button" class="flex flex-col items-center gap-1 text-[#555]">
-                    <span class="text-2xl">💰</span>
-                    <span class="text-xs font-semibold">Duxes</span>
-                </button>
-                <button type="button" class="flex flex-col items-center gap-1 text-[#555]">
                     <span class="text-2xl">☰</span>
                     <span class="text-xs font-semibold">Mais</span>
                 </button>

@@ -18,14 +18,14 @@ class CourseController extends Controller
     use HandlesCourseAuthorization;
     public function create(Request $request): View
     {
-        $teachers = $this->teachers();
+        $owners = $this->owners();
         $user = $request->user();
         $course = new Course([
             'status' => 'draft',
             'owner_id' => $user->id,
         ]);
 
-        return view('courses.create', compact('teachers', 'user', 'course'));
+        return view('courses.create', compact('owners', 'user', 'course'));
     }
 
     public function store(Request $request): RedirectResponse
@@ -86,9 +86,9 @@ class CourseController extends Controller
             'certificateBranding',
         ]);
 
-        $teachers = $this->teachers();
+        $owners = $this->owners();
 
-        return view('courses.edit', compact('course', 'teachers', 'user'));
+        return view('courses.edit', compact('course', 'owners', 'user'));
     }
 
     public function editModules(Request $request, Course $course): View
@@ -184,13 +184,13 @@ class CourseController extends Controller
 
         $course->delete();
 
-        return redirect()->route('dashboard')->with('status', 'Curso removido.');
+        return redirect()->route('admin.dashboard')->with('status', 'Curso removido.');
     }
 
-    private function teachers()
+    private function owners()
     {
         return User::query()
-            ->whereIn('role', [UserRole::TEACHER->value, UserRole::ADMIN->value])
+            ->where('role', UserRole::ADMIN->value)
             ->orderBy('name')
             ->get();
     }

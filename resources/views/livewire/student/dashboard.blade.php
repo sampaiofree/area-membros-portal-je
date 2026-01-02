@@ -11,12 +11,12 @@
         <div class="mt-4 grid gap-3 md:grid-cols-3">
             <label class="text-sm font-semibold text-slate-600">
                 <span>Buscar</span>
-                <input type="search" wire:model.debounce.500ms="search" placeholder="Titulo do curso"
+                <input type="search" wire:model.live.debounce.500ms="search" placeholder="Titulo do curso"
                     class="mt-1 w-full rounded-xl border border-edux-line px-4 py-3 focus:border-edux-primary focus:ring-edux-primary/30">
             </label>
             <label class="text-sm font-semibold text-slate-600">
                 <span>Status</span>
-                <select wire:model="status" class="mt-1 w-full rounded-xl border border-edux-line px-4 py-3 focus:border-edux-primary focus:ring-edux-primary/30">
+                <select wire:model.live="status" class="mt-1 w-full rounded-xl border border-edux-line px-4 py-3 focus:border-edux-primary focus:ring-edux-primary/30">
                     <option value="all">Todos</option>
                     <option value="running">Em andamento</option>
                     <option value="completed">Concluidos</option>

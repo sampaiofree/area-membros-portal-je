@@ -204,16 +204,7 @@ class LessonsManager extends Component
     private function canManageModule(): bool
     {
         $user = Auth::user();
-        $course = $this->module->course;
 
-        if (! $user) {
-            return false;
-        }
-
-        if ($user->isAdmin()) {
-            return true;
-        }
-
-        return $user->isTeacher() && $course->owner_id === $user->id;
+        return $user && $user->isAdmin();
     }
 }

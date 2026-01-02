@@ -4,7 +4,6 @@ namespace App\Livewire\Certificado;
 
 use App\Models\CertificateBranding;
 use App\Models\Course;
-use App\Models\SystemSetting;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
@@ -28,8 +27,6 @@ class Checkout extends Component
     public ?CertificateBranding $branding = null;
     public ?string $cpf = null;
 
-    private const FRONT_FALLBACK = 'system-assets/certificate-front-default.png';
-    private const BACK_FALLBACK = 'system-assets/certificate-back-default.png';
 
     public function mount(?string $course = null): void
     {
@@ -128,23 +125,15 @@ class Checkout extends Component
 
     public function getFrontBackgroundUrlProperty(): ?string
     {
-        $settings = SystemSetting::current();
-
         return $this->resolveBackgroundUrl(
-            $this->branding?->front_background_path,
-            $settings->default_certificate_front_path,
-            self::FRONT_FALLBACK
+            $this->branding?->front_background_path
         );
     }
 
     public function getBackBackgroundUrlProperty(): ?string
     {
-        $settings = SystemSetting::current();
-
         return $this->resolveBackgroundUrl(
-            $this->branding?->back_background_path,
-            $settings->default_certificate_back_path,
-            self::BACK_FALLBACK
+            $this->branding?->back_background_path
         );
     }
 

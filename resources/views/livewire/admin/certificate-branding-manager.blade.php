@@ -1,10 +1,8 @@
 @php
     $frontPreview = $front_background?->temporaryUrl()
-        ?? $branding->front_background_url
-        ?? $settings->assetUrl('default_certificate_front_path');
+        ?? $branding->front_background_url;
     $backPreview = $back_background?->temporaryUrl()
-        ?? $branding->back_background_url
-        ?? $settings->assetUrl('default_certificate_back_path');
+        ?? $branding->back_background_url;
 @endphp
 
 <section class="space-y-6 rounded-card bg-white p-6 shadow-card" x-data="{ frontPreviewOpen: false, backPreviewOpen: false }">
@@ -142,7 +140,7 @@
                     <figcaption class="px-3 py-2 text-center text-xs text-slate-500">Verso</figcaption>
                 </figure>
             </div>
-            <p class="mt-2 text-xs text-slate-500">Se nenhuma imagem aparecer, envie um fundo ou use os modelos padrão.</p>
+            <p class="mt-2 text-xs text-slate-500">Se nenhuma imagem aparecer, envie um fundo para visualizar.</p>
         </div>
 
         <div class="md:col-span-2 flex flex-wrap gap-3">

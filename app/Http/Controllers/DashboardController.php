@@ -11,27 +11,24 @@ class DashboardController extends Controller
     {
         $user = $request->user();
 
-        if ($user->isStudent()) {
-            $availableTabs = ['painel', 'cursos', 'vitrine', 'notificacoes', 'suporte', 'conta'];
-            $initialTab = in_array($request->query('tab'), $availableTabs, true) ? $request->query('tab') : 'painel';
-            $unreadCount = 0;
+        $availableTabs = ['painel', 'cursos', 'vitrine', 'notificacoes', 'suporte', 'conta'];
+        $requestedTab = $request->query('tab');
+        $initialTab = in_array($requestedTab, $availableTabs, true) ? $requestedTab : 'cursos';
+        $unreadCount = 0;
 
-            if (
-                \Illuminate\Support\Facades\Schema::hasTable('notifications') &&
-                \Illuminate\Support\Facades\Schema::hasColumn('notifications', 'notifiable_type') &&
-                \Illuminate\Support\Facades\Schema::hasColumn('notifications', 'notifiable_id')
-            ) {
-                $unreadCount = $user->unreadNotifications()->count();
-            }
-
-            return view('dashboard.student', [
-                'user' => $user,
-                'initialTab' => $initialTab,
-                'availableTabs' => $availableTabs,
-                'unreadCount' => $unreadCount,
-            ]);
+        if (
+            \Illuminate\Support\Facades\Schema::hasTable('notifications') &&
+            \Illuminate\Support\Facades\Schema::hasColumn('notifications', 'notifiable_type') &&
+            \Illuminate\Support\Facades\Schema::hasColumn('notifications', 'notifiable_id')
+        ) {
+            $unreadCount = $user->unreadNotifications()->count();
         }
 
-        return view('dashboard.admin'); 
+        return view('dashboard.student', [
+            'user' => $user,
+            'initialTab' => $initialTab,
+            'availableTabs' => $availableTabs,
+            'unreadCount' => $unreadCount,
+        ]);
     }
 }

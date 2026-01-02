@@ -11,7 +11,7 @@
                     <h1 class="font-display text-3xl text-edux-primary break-words">{{ $course->title }}</h1>
                     <p class="text-sm text-slate-600">Revise conteúdos, publique módulos e configure o teste final com segurança.</p>
                 </div>
-                <a href="{{ route('dashboard') }}" class="edux-btn bg-edux-primary text-white">
+                <a href="{{ route('admin.dashboard') }}" class="edux-btn bg-edux-primary text-white">
                     📚 Voltar para o painel
                 </a>
             </div>
@@ -50,7 +50,7 @@
             
             @include('courses.partials.form', [
                 'course' => $course,
-                'teachers' => $teachers,
+                'owners' => $owners,
                 'user' => $user,
                 'formClasses' => 'space-y-5'
             ])

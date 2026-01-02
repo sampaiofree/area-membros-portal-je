@@ -9,5 +9,5 @@
         <p class="text-slate-600">Defina título, resumo, certificado e publique quando estiver pronto.</p>
     </section>
 
-    @include('courses.partials.form', ['course' => $course, 'teachers' => $teachers, 'user' => $user])
+    @include('courses.partials.form', ['course' => $course, 'owners' => $owners, 'user' => $user])
 @endsection

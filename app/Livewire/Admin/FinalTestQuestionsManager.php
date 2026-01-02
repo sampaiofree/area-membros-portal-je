@@ -193,10 +193,6 @@ class FinalTestQuestionsManager extends Component
             return;
         }
 
-        if ($user->isTeacher() && $this->finalTest->course->owner_id === $user->id) {
-            return;
-        }
-
         abort(403);
     }
 

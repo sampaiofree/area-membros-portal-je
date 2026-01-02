@@ -4,7 +4,16 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
+        @php
+            use App\Models\SystemSetting;
+
+            $settings = SystemSetting::current();
+            $faviconUrl = $settings->assetUrl('favicon_path');
+        @endphp
         <title>@yield('title', 'EduX')</title>
+        @if ($faviconUrl)
+            <link rel="icon" href="{{ $faviconUrl }}">
+        @endif
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
@@ -26,9 +35,7 @@
     <body class="min-h-screen bg-gray-50 text-edux-text">
         @php
             use Illuminate\Support\Facades\Schema;
-            use App\Models\SystemSetting;
 
-            $settings = SystemSetting::current();
             $logoUrl = $settings->assetUrl('default_logo_dark_path');
 
             $unreadCount = (
@@ -37,20 +44,20 @@
                 Schema::hasColumn('notifications', 'notifiable_id') &&
                 auth()->check()
             ) ? auth()->user()->unreadNotifications()->count() : 0;
-            $duxBalance = session()->has('dux_balance')
-                ? (int) session('dux_balance')
-                : (auth()->check()
-                    ? \App\Models\DuxWallet::firstOrCreate(['user_id' => auth()->id()], ['balance' => 0])->balance
-                    : 0);
             $routeName = request()->route()?->getName();
             $user = auth()->user();
+            $dashboardTabs = ['painel', 'cursos', 'vitrine', 'notificacoes', 'suporte', 'conta'];
+            $dashboardTab = $routeName === 'dashboard'
+                ? (in_array(request('tab'), $dashboardTabs, true) ? request('tab') : 'cursos')
+                : null;
             $navActive = match (true) {
                 str_starts_with($routeName ?? '', 'learning.courses.') => 'cursos',
-                ($routeName === 'dashboard' && request('tab') === 'vitrine') => 'vitrine',
-                ($routeName === 'dashboard' && request('tab') === 'notificacoes') => 'notificacoes',
-                ($routeName === 'dashboard' && request('tab') === 'suporte') => 'suporte',
-                ($routeName === 'dashboard' && request('tab') === 'conta') => 'conta',
-                default => 'painel',
+                ($routeName === 'dashboard' && $dashboardTab === 'cursos') => 'cursos',
+                ($routeName === 'dashboard' && $dashboardTab === 'vitrine') => 'vitrine',
+                ($routeName === 'dashboard' && $dashboardTab === 'notificacoes') => 'notificacoes',
+                ($routeName === 'dashboard' && $dashboardTab === 'suporte') => 'suporte',
+                ($routeName === 'dashboard' && $dashboardTab === 'conta') => 'conta',
+                default => $dashboardTab ?? 'painel',
             };
         @endphp
 
@@ -68,25 +75,6 @@
 
                     <!-- A├º├Áes do Usu├írio -->
                     <div class="flex items-center gap-2">
-                         <!-- ├ìcone DUX com Badge -->
-                        <div class="relative">
-                            <button
-                                type="button"
-                                class="flex h-10 w-10 items-center justify-center rounded-md  bg-white/10 text-white hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/60 focus:ring-offset-2 focus:ring-offset-blue-600"
-                                aria-label="Saldo de DUX"
-                            >
-                                <span class="sr-only">Saldo de DUX</span>
-                                <span aria-hidden="true" class="text-2xl">
-                                    <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                                        <circle cx="12" cy="12" r="8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                                        <circle cx="12" cy="12" r="3" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                                        <path d="M9 12h6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                                    </svg>
-                                </span>
-                            </button>
-                            <div x-text="duxBalance" :class="bump ? 'scale-125' : ''" style="transition: transform 0.3s;" class="absolute -top-1 -right-2 flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-amber-400 px-1 text-xs font-bold text-white"></div>
-                        </div>
-                        
                         <!-- ├ìcone Notifica├º├Áes com Badge -->
                         <a
                             href="{{ route('learning.notifications.index') }}"
@@ -132,54 +120,9 @@
             function studentLayout() {
                 return {
                     mobileMenu: false,
-                    duxBalance: {{ $duxBalance }},
-                    bump: false,
-                    pop: false,
-                    init() {
-                        document.addEventListener('dux-earned', (event) => {
-                            const amount = Number(event.detail?.amount ?? 0);
-                            const balanceFromEvent = Number(event.detail?.balance ?? NaN);
-
-                            if (!Number.isNaN(balanceFromEvent)) {
-                                this.duxBalance = balanceFromEvent;
-                            } else {
-                                this.duxBalance += amount;
-                            }
-
-                            if (!amount && Number.isNaN(balanceFromEvent)) {
-                                return;
-                            }
-                            this.bump = true;
-                            setTimeout(() => this.bump = false, 600);
-                            this.pop = true;
-                            setTimeout(() => this.pop = false, 700);
-                        });
-                    }
+                    init() {}
                 }
             }
         </script>
-        @if (session()->has('dux_earned_amount'))
-            <script>
-                (() => {
-                    const amount = Number(@json(session('dux_earned_amount')));
-                    const balanceRaw = @json(session('dux_balance'));
-                    const hasBalance = balanceRaw !== null && balanceRaw !== undefined;
-                    const detail = hasBalance
-                        ? { amount, balance: Number(balanceRaw) }
-                        : { amount };
-
-                    const emit = () => document.dispatchEvent(new CustomEvent('dux-earned', { detail }));
-
-                    if (document.readyState === 'loading') {
-                        document.addEventListener('DOMContentLoaded', emit, { once: true });
-                    } else {
-                        requestAnimationFrame(emit);
-                    }
-
-                    // Livewire navigate nao dispara DOMContentLoaded; reforca o popup apos navegacao SPA
-                    window.addEventListener('livewire:navigated', () => emit(), { once: true });
-                })();
-            </script>
-        @endif
     </body>
 </html>

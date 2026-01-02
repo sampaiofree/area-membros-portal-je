@@ -7,7 +7,7 @@
         <p class="text-sm uppercase tracking-wide text-edux-primary">Branding</p>
         <h1 class="font-display text-3xl text-edux-primary">Identidade visual da plataforma</h1>
         <p class="text-slate-600">
-            Envie as artes padrão. Elas serão usadas automaticamente sempre que um curso, módulo, aula ou certificado não tiver mídia própria.
+            Envie as artes padrão. Elas serão usadas automaticamente sempre que um curso, módulo ou aula não tiver mídia própria.
         </p>
     </section>
 

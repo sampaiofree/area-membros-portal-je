@@ -19,12 +19,12 @@ class CourseSeeder extends Seeder
 {
     public function run(): void
     {
-        $teacher = User::firstOrCreate(
-            ['email' => 'professora@edux.test'],
+        $admin = User::firstOrCreate(
+            ['email' => 'admin@edux.test'],
             [
-                'name' => 'Professora Laura',
+                'name' => 'Administrador',
                 'password' => Hash::make('password'),
-                'role' => UserRole::TEACHER->value,
+                'role' => UserRole::ADMIN->value,
                 'email_verified_at' => now(),
             ]
         );
@@ -43,7 +43,7 @@ class CourseSeeder extends Seeder
         $course = Course::updateOrCreate(
             ['slug' => $slug],
             array_merge($courseData, [
-                'owner_id' => $teacher->id,
+                'owner_id' => $admin->id,
                 'slug' => $slug,
             ])
         );
@@ -141,7 +141,7 @@ class CourseSeeder extends Seeder
                     'title' => 'Quais perfis existem no Edux?',
                     'statement' => 'Selecione a alternativa correta sobre os perfis com acesso ao painel.',
                     'options' => [
-                        ['label' => 'Administrador, Professor e Aluno', 'is_correct' => true],
+                        ['label' => 'Administrador e Aluno', 'is_correct' => true],
                         ['label' => 'Administrador e Visitante', 'is_correct' => false],
                         ['label' => 'Somente aluno', 'is_correct' => false],
                     ],

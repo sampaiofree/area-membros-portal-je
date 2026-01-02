@@ -122,28 +122,6 @@
     @endonce
     <div x-data="window.publicLessonPage(@json($isLeadAuthenticated), @json($leadWhatsapp))" class="min-h-screen bg-gray-50 pb-6">
 
-        <div x-data="{ show:false, amount:0, timeout:null }"
-             x-show="show"
-             x-transition.opacity
-             x-transition.duration.300ms
-             @dux-earned.window="
-                amount = $event.detail?.amount || 0;
-                show = true;
-                clearTimeout(timeout);
-                timeout = setTimeout(() => show = false, 2500);
-             "
-             class="fixed right-4 top-4 z-50">
-            <div class="flex items-center gap-3 rounded-xl bg-amber-100 px-4 py-3 shadow-lg border border-amber-200">
-                <svg class="h-6 w-6 text-amber-500" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M10 2l2.39 4.84 5.34.78-3.86 3.76.91 5.32L10 14.77l-4.78 2.51.91-5.32L2.27 7.62l5.34-.78L10 2z"/>
-                </svg>
-                <div>
-                    <p class="text-sm font-bold text-amber-800">🪙 Você ganhou <span x-text="amount"></span> DUX!</p>
-                    <p class="text-xs text-amber-700">Parabéns por concluir a aula</p>
-                </div>
-            </div>
-        </div>
-
         @unless ($certificateStage)
             <header class="sticky top-0 z-30 bg-white shadow-sm border-b">
             <div class="max-w-[420px] mx-auto w-full px-4 py-3">

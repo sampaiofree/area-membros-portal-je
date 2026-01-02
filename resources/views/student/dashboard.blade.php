@@ -32,15 +32,6 @@
 
             <a href="#" class="group">
                 <div class="bg-white rounded-2xl shadow p-4 flex flex-col items-center justify-center aspect-square min-h-[118px]">
-                    <div class="w-14 h-14 rounded-xl flex items-center justify-center bg-[#E9F9EC] text-3xl">
-                        💰
-                    </div>
-                    <span class="mt-3 font-bold text-sm text-[#333] text-center">Duxes</span>
-                </div>
-            </a>
-
-            <a href="#" class="group">
-                <div class="bg-white rounded-2xl shadow p-4 flex flex-col items-center justify-center aspect-square min-h-[118px]">
                     <div class="w-14 h-14 rounded-xl flex items-center justify-center bg-[#F3E9FD] text-3xl">
                         🔔
                     </div>
@@ -70,10 +61,6 @@
                     <span class="text-2xl">🎓</span>
                     <span class="text-xs font-semibold">Cursos</span>
                 </a>
-                <button type="button" class="flex flex-col items-center gap-1 text-[#555]">
-                    <span class="text-2xl">💰</span>
-                    <span class="text-xs font-semibold">Duxes</span>
-                </button>
                 <button type="button" class="flex flex-col items-center gap-1 text-[#555]">
                     <span class="text-2xl">☰</span>
                     <span class="text-xs font-semibold">Mais</span>

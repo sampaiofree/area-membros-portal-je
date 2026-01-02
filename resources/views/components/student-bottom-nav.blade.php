@@ -112,6 +112,14 @@
                     <span>{{ $item['label'] }}</span>
                 </a>
             @endforeach
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <button type="submit"
+                    class="flex w-full items-center gap-3 px-3 py-2 text-sm font-semibold transition-colors rounded-lg text-red-600 hover:bg-red-50">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 11-6 0V7a3 3 0 016 0v1"/></svg>
+                    <span>Sair</span>
+                </button>
+            </form>
         </div>
     </div>
 </nav>

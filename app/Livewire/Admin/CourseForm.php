@@ -96,7 +96,7 @@ class CourseForm extends Component
     public function render()
     {
         return view('livewire.admin.course-form', [
-            'teachers' => $this->teachers(),
+            'owners' => $this->owners(),
             'branding' => $this->course?->certificateBranding,
         ]);
     }
@@ -197,10 +197,10 @@ class CourseForm extends Component
         return $slug;
     }
 
-    private function teachers()
+    private function owners()
     {
         return User::query()
-            ->whereIn('role', ['admin', 'teacher'])
+            ->where('role', 'admin')
             ->orderBy('name')
             ->get();
     }

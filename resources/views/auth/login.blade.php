@@ -7,7 +7,7 @@
         <h1 class="font-display text-3xl text-edux-primary">Acesse sua conta</h1>
         <p class="mt-2 text-sm text-slate-600">
             Utilize o e-mail fornecido. Usuários de teste: <strong>admin@edux.test</strong>,
-            <strong>professora@edux.test</strong>, <strong>aluno@edux.test</strong> (senha <code>password</code>).
+            <strong>aluno@edux.test</strong> (senha <code>password</code>).
         </p>
         <form method="POST" action="{{ route('login.store') }}" class="mt-6 space-y-4">
             @csrf

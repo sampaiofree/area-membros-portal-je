@@ -9,12 +9,10 @@ use App\Models\Course;
 use App\Models\Lesson;
 use App\Models\LessonCompletion;
 use App\Models\SystemSetting;
-use App\Services\DuxWalletService;
 use App\Support\EnsuresStudentEnrollment;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Livewire\Component;
-use RuntimeException;
 
 class LessonScreen extends Component
 {
@@ -98,30 +96,6 @@ class LessonScreen extends Component
         $nextLesson = $this->course->nextLessonFor($this->user);
         $this->refreshState();
 
-        try {
-            $transaction = app(DuxWalletService::class)->applyRule($this->user, "lesson_completed", [
-                "lesson_id" => $this->lesson->id,
-                "course_id" => $this->course->id,
-            ]);
-
-            $transaction->loadMissing('wallet');
-            $earned = (int) $transaction->amount;
-            $newBalance = $transaction->wallet?->balance ?? app(DuxWalletService::class)->walletFor($this->user)->balance;
-
-            // dispara evento imediato e persiste para proxima navegacao
-            $this->dispatch("dux-earned", [
-                "amount" => $earned,
-                "balance" => $newBalance,
-            ]);
-
-            session()->flash('dux_earned_amount', $earned);
-            session()->flash('dux_balance', $newBalance);
-        } catch (RuntimeException $e) {
-            report($e);
-        } catch (\Throwable $e) {
-            report($e);
-        }
-
         if ($nextLesson && $nextLesson->id !== $this->lesson->id) {
             $this->redirectRoute("learning.courses.lessons.show", [$this->course, $nextLesson], navigate: true);
             return;
@@ -184,18 +158,6 @@ class LessonScreen extends Component
         $this->enrollment->forceFill(['completed_at' => now(), 'progress_percent' => 100])->save();
         $this->certificate = $certificate;
         $this->statusMessage = 'Certificado emitido com sucesso!';
-
-        try {
-            app(DuxWalletService::class)->applyRule($this->user, 'certificate_fee', [
-                'course_id' => $this->course->id,
-                'certificate_id' => $certificate->id,
-            ]);
-        } catch (RuntimeException $e) {
-            $this->errorMessage = $e->getMessage();
-            return;
-        } catch (\Throwable $e) {
-            // nao bloqueia fluxo se regra nao existir ou falhar
-        }
 
         $this->redirectRoute('learning.courses.certificate.show', [$this->course, $certificate], navigate: true);
     }

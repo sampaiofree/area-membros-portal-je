@@ -21,8 +21,6 @@ class SystemAssetsManager extends Component
         'course' => null,
         'module' => null,
         'lesson' => null,
-        'certificate_front' => null,
-        'certificate_back' => null,
     ];
 
     protected array $fieldMap = [
@@ -56,16 +54,6 @@ class SystemAssetsManager extends Component
             'label' => 'Imagem padrÃ£o da aula',
             'hint' => 'SugestÃ£o 800x400 px',
         ],
-        'certificate_front' => [
-            'column' => 'default_certificate_front_path',
-            'label' => 'Fundo frente do certificado',
-            'hint' => 'SugestÃ£o A4 paisagem',
-        ],
-        'certificate_back' => [
-            'column' => 'default_certificate_back_path',
-            'label' => 'Fundo verso do certificado',
-            'hint' => 'SugestÃ£o A4 paisagem',
-        ],
     ];
 
     protected function rules(): array
@@ -77,8 +65,6 @@ class SystemAssetsManager extends Component
             'uploads.course' => ['nullable', 'image', 'max:1024'],
             'uploads.module' => ['nullable', 'image', 'max:1024'],
             'uploads.lesson' => ['nullable', 'image', 'max:1024'],
-            'uploads.certificate_front' => ['nullable', 'image', 'max:2048'],
-            'uploads.certificate_back' => ['nullable', 'image', 'max:2048'],
         ];
     }
 

@@ -4,7 +4,6 @@ namespace App\Services;
 
 use App\Models\CertificateBranding;
 use App\Models\Course;
-use App\Models\SystemSetting;
 use Carbon\Carbon;
 use Dompdf\Dompdf;
 use Dompdf\Options;
@@ -18,8 +17,6 @@ class CertificadoService
 {
     private const INITIAL_FONT_SIZE = 12;
     private const MIN_FONT_SIZE = 7;
-    private const VERSO_BACKGROUND_FALLBACK = 'system-assets/certificate-back-default.png';
-    private const FRENTE_BACKGROUND_FALLBACK = 'system-assets/certificate-front-default.png';
     public function pdfVerso(Course $course): string
     {
         $course->loadMissing(['certificateBranding', 'modules.lessons']);
@@ -327,9 +324,9 @@ class CertificadoService
         $version = $this->versoVersion($course);
         $directory = "certificates/back/course-{$course->id}";
         $paragraphs = $this->buildVersoParagraphs($course);
+        $branding = $this->resolveBranding($course);
         $backgroundImagePath = $this->resolveBackgroundPath(
-            $course->certificateBranding?->back_background_path,
-            self::VERSO_BACKGROUND_FALLBACK
+            $branding->back_background_path
         );
 
         return [
@@ -352,8 +349,10 @@ class CertificadoService
         $hash = md5(sprintf('%s|%s|%s|%s', $studentName, $courseName, $completedAtRaw, $cpf ?? ''));
 
         $branding = $data['certificate_branding'] ?? $data['branding'] ?? null;
-        $brandingPath = $branding instanceof CertificateBranding ? $branding->front_background_path : null;
-        $defaultFrontPath = SystemSetting::query()->value('default_certificate_front_path');
+        if (! $branding instanceof CertificateBranding) {
+            $branding = CertificateBranding::firstOrCreate(['course_id' => null]);
+        }
+        $brandingPath = $branding->front_background_path;
 
         $directory = "certificates/front/{$hash}";
 
@@ -366,11 +365,15 @@ class CertificadoService
             'pdfRelative' => "{$directory}/front.pdf",
             'pngRelative' => "{$directory}/front.png",
             'backgroundImagePath' => $this->resolveBackgroundPath(
-                $brandingPath,
-                $defaultFrontPath,
-                self::FRENTE_BACKGROUND_FALLBACK
+                $brandingPath
             ),
         ];
+    }
+
+    private function resolveBranding(Course $course): CertificateBranding
+    {
+        return $course->certificateBranding
+            ?? CertificateBranding::firstOrCreate(['course_id' => null]);
     }
 
     private function requiredField(array $data, string $key): string

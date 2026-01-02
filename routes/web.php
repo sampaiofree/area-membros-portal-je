@@ -80,70 +80,63 @@ Route::middleware('auth')->group(function (): void {
     // Edição do perfil do aluno
     Route::view('/conta', 'account.profile')->name('account.edit');
 
-    Route::middleware('role:admin,teacher')->group(function (): void {
-        // Gerenciamento de cursos
-        // Formulário de criação de curso
-        Route::get('courses/create', [CourseController::class, 'create'])->name('courses.create');
-        // Persistência de novo curso
-        Route::post('courses', [CourseController::class, 'store'])->name('courses.store');
-        // Edição de curso existente
-        Route::get('courses/{course}/edit', [CourseController::class, 'edit'])->name('courses.edit');
-        // Edita módulos do curso
-        Route::get('courses/{course}/modules', [CourseController::class, 'editModules'])->name('courses.modules.edit'); 
-        // Tela de teste final do curso
-        Route::get('courses/{course}/final-test', [CourseController::class, 'editFinalTest'])->name('courses.final-test.edit');
-        // Atualiza curso (POST porque usa formulário)
-        Route::post('courses/{course}', [CourseController::class, 'update'])->name('courses.update.post');
-        // Exclui curso
-        Route::delete('courses/{course}', [CourseController::class, 'destroy'])->name('courses.destroy');
+    Route::prefix('admin')
+        ->middleware('role:admin')
+        ->group(function (): void {
+            Route::view('dashboard', 'dashboard.admin')->name('admin.dashboard');
 
-    });
+            // Gerenciamento de cursos
+            // Formulário de criação de curso
+            Route::get('courses/create', [CourseController::class, 'create'])->name('courses.create');
+            // Persistência de novo curso
+            Route::post('courses', [CourseController::class, 'store'])->name('courses.store');
+            // Edição de curso existente
+            Route::get('courses/{course}/edit', [CourseController::class, 'edit'])->name('courses.edit');
+            // Edita módulos do curso
+            Route::get('courses/{course}/modules', [CourseController::class, 'editModules'])->name('courses.modules.edit'); 
+            // Tela de teste final do curso
+            Route::get('courses/{course}/final-test', [CourseController::class, 'editFinalTest'])->name('courses.final-test.edit');
+            // Atualiza curso (POST porque usa formulário)
+            Route::post('courses/{course}', [CourseController::class, 'update'])->name('courses.update.post');
+            // Exclui curso
+            Route::delete('courses/{course}', [CourseController::class, 'destroy'])->name('courses.destroy');
+
+            // Administração e configurações globais
+            // Editor de branding de certificados
+            Route::view('certificates/branding', 'certificates.branding.edit')
+                ->name('certificates.branding.edit');
+            // Edita identidade institucional
+            Route::get('identity', [SystemIdentityController::class, 'edit'])
+                ->name('admin.identity');
+            // Atualiza identidade
+            Route::put('identity', [SystemIdentityController::class, 'update'])
+                ->name('admin.identity.update');
+            // Listagem de usuários
+            Route::get('users', [UserController::class, 'index'])
+                ->name('admin.users.index');
+            // Criar novo usuário via formulário
+            Route::get('users/create', fn () => view('admin.users.create'))
+                ->name('admin.users.create');
+            // Editar usuário específico
+            Route::get('users/{user}/edit', [UserController::class, 'edit'])
+                ->name('admin.users.edit');
+            // Atualizar dados do usuário
+            Route::put('users/{user}', [UserController::class, 'update'])
+                ->name('admin.users.update');
+            // Lista de pagamentos de certificados
+            Route::view('certificates/payments', 'admin.certificates.payments')
+                ->name('admin.certificates.payments');
+            // Central de notificações administrativas
+            Route::view('notifications', 'admin.notifications.index')
+                ->name('admin.notifications.index');
+        });
 
     Route::middleware('role:admin')->group(function (): void {
-        // Administração e configurações globais
-        // Listagem de regras DUX
-        Route::get('admin/dux/rules', [\App\Http\Controllers\Admin\DuxRuleController::class, 'index'])->name('admin.dux.rules.index');
-        // Atualiza regra DUX específica
-        Route::put('admin/dux/rules/{rule}', [\App\Http\Controllers\Admin\DuxRuleController::class, 'update'])->name('admin.dux.rules.update');
-
-        // Listagem de pacotes DUX
-        Route::get('admin/dux/packs', [\App\Http\Controllers\Admin\DuxPackController::class, 'index'])->name('admin.dux.packs.index');
-        // Cria novo pacote DUX
-        Route::post('admin/dux/packs', [\App\Http\Controllers\Admin\DuxPackController::class, 'store'])->name('admin.dux.packs.store');
-        // Atualiza pacote DUX
-        Route::put('admin/dux/packs/{pack}', [\App\Http\Controllers\Admin\DuxPackController::class, 'update'])->name('admin.dux.packs.update');
-        // Remove pacote DUX
-        Route::delete('admin/dux/packs/{pack}', [\App\Http\Controllers\Admin\DuxPackController::class, 'destroy'])->name('admin.dux.packs.destroy');
-        // Editor de branding de certificados
-        Route::view('certificates/branding', 'certificates.branding.edit')
-            ->name('certificates.branding.edit');
-        // Edita identidade institucional
-        Route::get('admin/identity', [SystemIdentityController::class, 'edit'])
-            ->name('admin.identity');
-        // Atualiza identidade
-        Route::put('admin/identity', [SystemIdentityController::class, 'update'])
-            ->name('admin.identity.update');
-        // Listagem de usuários
-        Route::get('admin/users', [UserController::class, 'index'])
-            ->name('admin.users.index');
-        // Criar novo usuário via formulário
-        Route::get('admin/users/create', fn () => view('admin.users.create'))
-            ->name('admin.users.create');
-        // Editar usuário específico
-        Route::get('admin/users/{user}/edit', [UserController::class, 'edit'])
-            ->name('admin.users.edit');
-        // Atualizar dados do usuário
-        Route::put('admin/users/{user}', [UserController::class, 'update'])
-            ->name('admin.users.update');
-        // Formulário de criação de professores (reusa layout de usuários)
-        Route::view('admin/professors/create', 'admin.users.create')
-            ->name('admin.professors.create');
-        // Lista de pagamentos de certificados
-        Route::view('admin/certificates/payments', 'admin.certificates.payments')
-            ->name('admin.certificates.payments');
-        // Central de notificações administrativas
-        Route::view('admin/notifications', 'admin.notifications.index')
-            ->name('admin.notifications.index');
+        Route::get('courses/create', fn () => redirect()->route('courses.create'));
+        Route::get('courses/{course}/edit', fn ($course) => redirect()->route('courses.edit', $course));
+        Route::get('courses/{course}/modules', fn ($course) => redirect()->route('courses.modules.edit', $course));
+        Route::get('courses/{course}/final-test', fn ($course) => redirect()->route('courses.final-test.edit', $course));
+        Route::get('certificates/branding', fn () => redirect()->route('certificates.branding.edit'));
     });
 
     Route::prefix('learning')
