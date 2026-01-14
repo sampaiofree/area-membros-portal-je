@@ -85,6 +85,7 @@
                         <li><a href="{{ route('admin.dashboard') }}" class="block rounded-lg px-3 py-2 hover:bg-edux-background">Cursos cadastrados</a></li>
                         <!--<li><a href="{{ route('admin.certificates.payments') }}" class="block rounded-lg px-3 py-2 hover:bg-edux-background">Pagamentos certificados</a></li>-->
                         <li><a href="{{ route('admin.notifications.index') }}" class="block rounded-lg px-3 py-2 hover:bg-edux-background">Notificacoes</a></li>
+                        <li><a href="{{ route('admin.kavoo.index') }}" class="block rounded-lg px-3 py-2 hover:bg-edux-background">Kavoo</a></li>
                         
                     </ul>
                 </aside>

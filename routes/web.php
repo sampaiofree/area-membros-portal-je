@@ -1,5 +1,6 @@
 ﻿<?php
 
+use App\Http\Controllers\Admin\KavooController;
 use App\Http\Controllers\Admin\SystemIdentityController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\AuthController;
@@ -129,6 +130,13 @@ Route::middleware('auth')->group(function (): void {
             // Central de notificações administrativas
             Route::view('notifications', 'admin.notifications.index')
                 ->name('admin.notifications.index');
+            // Área administrativa Kavoo
+            Route::get('kavoo', [KavooController::class, 'index'])->name('admin.kavoo.index');
+            Route::get('kavoo/create', [KavooController::class, 'create'])->name('admin.kavoo.create');
+            Route::post('kavoo', [KavooController::class, 'store'])->name('admin.kavoo.store');
+            Route::get('kavoo/{kavoo}/edit', [KavooController::class, 'edit'])->name('admin.kavoo.edit');
+            Route::put('kavoo/{kavoo}', [KavooController::class, 'update'])->name('admin.kavoo.update');
+            Route::delete('kavoo/{kavoo}', [KavooController::class, 'destroy'])->name('admin.kavoo.destroy');
         });
 
     Route::middleware('role:admin')->group(function (): void {

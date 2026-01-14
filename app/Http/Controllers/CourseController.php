@@ -41,6 +41,7 @@ class CourseController extends Controller
             'duration_minutes' => ['nullable', 'integer', 'min:1'],
             'published_at' => ['nullable', 'date'],
             'owner_id' => ['nullable', 'exists:users,id'],
+            'kavoo_id' => ['nullable', 'integer', 'min:0'],
             'certificate_front_background' => ['nullable', 'image', 'max:4096'],
             'certificate_back_background' => ['nullable', 'image', 'max:4096'],
             'cover_image' => ['nullable', 'image', 'max:4096'],
@@ -63,6 +64,7 @@ class CourseController extends Controller
             'status' => $validated['status'],
             'duration_minutes' => $validated['duration_minutes'] ?? null,
             'published_at' => $validated['published_at'] ?? null,
+            'kavoo_id' => $user->isAdmin() ? ($validated['kavoo_id'] ?? null) : null,
         ]);
 
         if ($request->hasFile('cover_image')) {
@@ -129,6 +131,7 @@ class CourseController extends Controller
             'duration_minutes' => ['nullable', 'integer', 'min:1'],
             'published_at' => ['nullable', 'date'],
             'owner_id' => ['nullable', 'exists:users,id'],
+            'kavoo_id' => ['nullable', 'integer', 'min:0'],
             'certificate_front_background' => ['nullable', 'image', 'max:4096'],
             'certificate_back_background' => ['nullable', 'image', 'max:4096'],
             'cover_image' => ['nullable', 'image', 'max:4096'],
@@ -142,6 +145,7 @@ class CourseController extends Controller
             'status' => $validated['status'],
             'duration_minutes' => $validated['duration_minutes'] ?? null,
             'published_at' => $validated['published_at'] ?? null,
+            'kavoo_id' => $user->isAdmin() ? ($validated['kavoo_id'] ?? null) : $course->kavoo_id,
         ]);
 
         if ($user->isAdmin() && isset($validated['owner_id'])) {

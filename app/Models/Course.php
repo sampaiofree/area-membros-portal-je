@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Kavoo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -25,6 +26,7 @@ class Course extends Model
         'status',
         'duration_minutes',
         'published_at',
+        'kavoo_id',
     ];
 
     protected function casts(): array
@@ -32,6 +34,7 @@ class Course extends Model
         return [
             'published_at' => 'datetime',
             'certificate_price' => 'decimal:2',
+            'kavoo_id' => 'integer',
         ];
     }
 
@@ -83,6 +86,11 @@ class Course extends Model
     public function certificatePayments(): HasMany
     {
         return $this->hasMany(CertificatePayment::class);
+    }
+
+    public function kavooRecords(): HasMany
+    {
+        return $this->hasMany(Kavoo::class, 'item_product_id', 'kavoo_id');
     }
 
     public function checkouts(): HasMany
