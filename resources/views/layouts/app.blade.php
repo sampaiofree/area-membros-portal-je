@@ -48,7 +48,7 @@
                         <button type="submit" class="edux-btn bg-red-500 text-white hover:shadow-lg">Sair</button>
                     </form>
                 @else
-                    <a href="{{ route('login') }}" class="edux-btn bg-edux-cta text-edux-text">Entrar</a>
+                    <!--<a href="{{ route('login') }}" class="edux-btn bg-edux-cta text-edux-text">Entrar</a>-->
                 @endauth
                 <button class="md:hidden" @click="mobileMenu = !mobileMenu" aria-label="Abrir menu">
                     <svg class="h-7 w-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
