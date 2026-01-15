@@ -8,10 +8,12 @@ use App\Models\Course;
 use App\Models\Enrollment;
 use App\Models\Kavoo;
 use App\Models\User;
+use App\Mail\WelcomeKavooUser;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class KavooWebhookController extends Controller
 {
@@ -84,7 +86,7 @@ class KavooWebhookController extends Controller
                 continue;
             }
 
-            if ($user === null AND  $kavooData['status_code'] == 'SALE_APPROVED') {
+            if ($user === null && $kavooData['status_code'] === 'SALE_APPROVED') {
                 $user = $this->ensureCustomerUser($kavoo);
             }
 
@@ -110,7 +112,7 @@ class KavooWebhookController extends Controller
         }
 
         try {
-            return User::create([
+            $user = User::create([
                 'name' => $kavoo->customer_name ?? $customerEmail,
                 'display_name' => $kavoo->customer_name ?? $customerEmail,
                 'email' => $customerEmail,
@@ -118,8 +120,20 @@ class KavooWebhookController extends Controller
                 'role' => UserRole::STUDENT,
                 'password' => 'mudar123',
             ]);
+
+            try {
+                Mail::to($user->email)->send(new WelcomeKavooUser($user, 'mudar123'));
+            } catch (\Throwable $mailException) {
+                Log::warning('Falha ao enviar e-mail de boas-vindas Kavoo', [
+                    'error' => $mailException->getMessage(),
+                    'customer_email' => $customerEmail,
+                    'kavoo_id' => $kavoo->id,
+                ]);
+            }
+
+            return $user;
         } catch (\Throwable $exception) {
-            Log::error('Falha ao criar usuário da Kavoo', [
+            Log::error('Falha ao criar usuario da Kavoo', [
                 'error' => $exception->getMessage(),
                 'customer_email' => $customerEmail,
                 'kavoo_id' => $kavoo->id,
@@ -155,7 +169,7 @@ class KavooWebhookController extends Controller
                 'user_id' => $user->id,
             ]);
         } catch (\Throwable $exception) {
-            Log::error('Falha ao criar matrícula Kavoo', [
+            Log::error('Falha ao criar matricula Kavoo', [
                 'error' => $exception->getMessage(),
                 'course_id' => $course->id,
                 'user_id' => $user->id,
