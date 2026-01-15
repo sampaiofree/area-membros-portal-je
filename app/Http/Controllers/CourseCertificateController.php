@@ -9,6 +9,7 @@ use App\Support\EnsuresStudentEnrollment;
 use Dompdf\Dompdf;
 use Dompdf\Options;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 use Illuminate\View\View;
 
 class CourseCertificateController extends Controller
@@ -75,20 +76,26 @@ class CourseCertificateController extends Controller
         $certificate->loadMissing('user');
         $options = new Options();
         $options->set('defaultFont', 'Inter');
+        $options->setIsRemoteEnabled(true);
         $dompdf = new Dompdf($options);
 
         $branding = $this->resolveBranding($course);
+        $publicUrl = route('certificates.verify', $certificate->public_token);
+        $qrDataUri = $this->qrDataUri($publicUrl);
         $frontContent = view('learning.certificates.templates.front', [
             'course' => $course,
             'branding' => $branding,
             'displayName' => $certificate->user->preferredName(),
             'issuedAt' => $certificate->issued_at ?? now(),
-            'publicUrl' => route('certificates.verify', $certificate->public_token),
+            'publicUrl' => $publicUrl,
+            'qrDataUri' => $qrDataUri,
+            'mode' => 'pdf',
         ])->render();
 
         $backContent = view('learning.certificates.templates.back', [
             'course' => $course,
             'branding' => $branding,
+            'mode' => 'pdf',
         ])->render();
 
         $html = view('learning.certificates.pdf', compact('frontContent', 'backContent'))->render();
@@ -98,5 +105,27 @@ class CourseCertificateController extends Controller
         $dompdf->render();
 
         return $dompdf;
+    }
+
+    private function qrDataUri(?string $publicUrl): ?string
+    {
+        if (! $publicUrl) {
+            return null;
+        }
+
+        try {
+            $response = Http::withoutVerifying()->timeout(5)->get('https://api.qrserver.com/v1/create-qr-code/', [
+                'size' => '240x240',
+                'data' => $publicUrl,
+            ]);
+
+            if (! $response->successful()) {
+                return null;
+            }
+
+            return 'data:image/png;base64,' . base64_encode($response->body());
+        } catch (\Throwable $exception) {
+            return null;
+        }
     }
 }

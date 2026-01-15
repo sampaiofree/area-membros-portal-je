@@ -2,184 +2,261 @@
 
 namespace App\Livewire\Certificado;
 
+use App\Models\Certificate;
 use App\Models\CertificateBranding;
 use App\Models\Course;
+use App\Models\Enrollment;
+use App\Models\SystemSetting;
 use Carbon\Carbon;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Storage;
+use Dompdf\Dompdf;
+use Dompdf\Options;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 use Livewire\Component;
 
 class Checkout extends Component
 {
-    public int $step = 1;
-    public bool $showPix = false;
-    public bool $showSuccess = false;
-    public bool $showCourseModal = false;
-
-    public ?int $selectedCourseId = null;
-    public string $courseName = '';
-    public string $certificateName = '';
-    public string $completionDate = '';
-    public string $whatsapp = '';
-    public string $email = '';
-    public int $workload = 160;
-    public ?Course $course = null;
-    public ?CertificateBranding $branding = null;
+    public ?int $courseId = null;
+    public ?string $completionDate = null;
     public ?string $cpf = null;
+    public string $completionConfirmed = '';
 
+    public ?Course $course = null;
+    public ?Enrollment $enrollment = null;
+    public ?CertificateBranding $branding = null;
+    public ?string $statusMessage = null;
+    public ?string $errorMessage = null;
 
-    public function mount(?string $course = null): void
+    public function mount(): void
     {
-        if ($course) {
-            $this->course = Course::where('slug', $course)->firstOrFail();
-        } else {
-            $this->course = Course::query()->orderBy('title')->firstOrFail();
-        }
+        $user = Auth::user();
 
-        $this->courseName = $this->course->title;
-        $this->selectedCourseId = $this->course->id;
-        $this->completionDate = Carbon::now()->format('Y-m-d');
-        $this->branding = $this->resolveBranding($this->course);
-    }
-
-    public function render()
-    {
-        return view('livewire.certificado.checkout', [
-            'courses' => $this->courses(),
-            'workloads' => $this->workloadOptions(),
-            'frontBackgroundUrl' => $this->frontBackgroundUrl,
-            'backBackgroundUrl' => $this->backBackgroundUrl,
-            'formattedCompletionDate' => $this->formattedCompletionDate,
-            'completionPeriodStart' => $this->completionPeriodStart,
-            'completionPeriodEnd' => $this->completionPeriodEnd,
-            'formattedCpf' => $this->formattedCpf,
-            'backPreviewParagraphs' => $this->backPreviewParagraphs,
-        ]);
-    }
-
-    public function openCourseModal(): void
-    {
-        $this->showCourseModal = true;
-    }
-
-    public function closeCourseModal(): void
-    {
-        $this->showCourseModal = false;
-    }
-
-    public function selectCourse(int $courseId): void
-    {
-        $course = Course::find($courseId);
-
-        if (! $course) {
+        if (! $user) {
             return;
         }
 
-        $this->selectedCourseId = $course->id;
-        $this->course = $course;
-        $this->branding = $this->resolveBranding($course);
-        $this->courseName = $course->title;
-        $this->showCourseModal = false;
+        $enrollment = Enrollment::with(['course.certificateBranding'])
+            ->where('user_id', $user->id)
+            ->latest('created_at')
+            ->first();
+
+        if ($enrollment) {
+            $this->setEnrollment($enrollment);
+        }
     }
 
-    public function nextStep(): void
+    public function updatedCourseId($value): void
     {
-        if ($this->step === 1 && ! $this->canAdvanceFromStepOne()) {
+        $this->resetMessages();
+
+        $enrollment = $this->findEnrollment((int) $value);
+
+        if ($enrollment) {
+            $this->setEnrollment($enrollment, true);
             return;
         }
 
-        $this->validateStep();
-
-        if ($this->step < 5) {
-            $this->step++;
-        }
+        $this->course = null;
+        $this->branding = null;
+        $this->enrollment = null;
     }
 
-    public function previousStep(): void
-    {
-        if ($this->step > 1) {
-            $this->step--;
-        }
-    }
-
-    public function startPixPayment(): void
-    {
-        $this->showPix = true;
-    }
-
-    public function confirmPayment(): void
-    {
-        $this->showSuccess = true;
-    }
-
-    public function updatedCpf(?string $value): void
+    public function updatedCpf($value): void
     {
         $sanitized = preg_replace('/\D/', '', $value ?: '');
         $this->cpf = $sanitized !== '' ? $sanitized : null;
     }
 
-    public function canAdvanceFromStepOne(): bool
+    public function generateCertificate()
     {
-        return $this->course !== null;
-    }
+        $this->resetMessages();
 
-    public function getFrontBackgroundUrlProperty(): ?string
-    {
-        return $this->resolveBackgroundUrl(
-            $this->branding?->front_background_path
-        );
-    }
+        $user = Auth::user();
 
-    public function getBackBackgroundUrlProperty(): ?string
-    {
-        return $this->resolveBackgroundUrl(
-            $this->branding?->back_background_path
-        );
-    }
-
-    public function getFormattedCompletionDateProperty(): ?string
-    {
-        return $this->formatDate($this->completionDate);
-    }
-
-    public function getCompletionPeriodStartProperty(): ?string
-    {
-        return $this->formatDate($this->completionDate);
-    }
-
-    public function getCompletionPeriodEndProperty(): ?string
-    {
-        return $this->formatDate($this->completionDate);
-    }
-
-    public function getBackPreviewParagraphsProperty(): array
-    {
-        if (! $this->course) {
-            return [];
+        if (! $user) {
+            $this->errorMessage = 'Sessao expirada. Faca login novamente.';
+            return null;
         }
 
-        $this->course->loadMissing(['modules.lessons']);
+        $validated = $this->validate([
+            'courseId' => ['required', 'integer'],
+            'completionDate' => ['nullable', 'date'],
+            'cpf' => ['nullable', 'string'],
+            'completionConfirmed' => ['required', Rule::in(['yes'])],
+        ]);
 
-        return $this->buildBackPreviewParagraphs($this->course);
-    }
+        $enrollment = $this->findEnrollment((int) $validated['courseId']);
 
-    private function resolveBackgroundUrl(?string ...$paths): ?string
-    {
-        $disk = Storage::disk('public');
-
-        foreach ($paths as $path) {
-            if (! $path) {
-                continue;
-            }
-
-            if (! $disk->exists($path)) {
-                continue;
-            }
-
-            return $disk->url($path);
+        if (! $enrollment || ! $enrollment->course) {
+            $this->errorMessage = 'Matricula nao encontrada para este curso.';
+            return null;
         }
 
-        return null;
+        $course = $enrollment->course;
+        $issuedAt = $this->resolveIssuedAt($validated['completionDate'] ?? null, $enrollment);
+        $branding = $this->resolveBranding($course);
+        $formattedCpf = $this->formatCpf($this->cpf);
+
+        $certificate = Certificate::firstOrNew([
+            'course_id' => $course->id,
+            'user_id' => $user->id,
+        ]);
+
+        if (! $certificate->number) {
+            $certificate->number = 'EDUX-' . strtoupper(Str::random(8));
+        }
+
+        if (! $certificate->public_token) {
+            $certificate->public_token = (string) Str::uuid();
+        }
+
+        $publicUrl = route('certificates.verify', $certificate->public_token);
+        $settings = SystemSetting::current();
+        $qrDataUri = $this->qrDataUri($publicUrl);
+
+        $frontContent = view('learning.certificates.templates.front', [
+            'course' => $course,
+            'branding' => $branding,
+            'displayName' => $user->preferredName(),
+            'issuedAt' => $issuedAt,
+            'publicUrl' => $publicUrl,
+            'settings' => $settings,
+            'cpf' => $formattedCpf,
+            'qrDataUri' => $qrDataUri,
+        ])->render();
+
+        $backContent = view('learning.certificates.templates.back', [
+            'course' => $course,
+            'branding' => $branding,
+            'settings' => $settings,
+        ])->render();
+
+        $frontPdfContent = view('learning.certificates.templates.front', [
+            'course' => $course,
+            'branding' => $branding,
+            'displayName' => $user->preferredName(),
+            'issuedAt' => $issuedAt,
+            'publicUrl' => $publicUrl,
+            'settings' => $settings,
+            'cpf' => $formattedCpf,
+            'mode' => 'pdf',
+            'qrDataUri' => $qrDataUri,
+        ])->render();
+
+        $backPdfContent = view('learning.certificates.templates.back', [
+            'course' => $course,
+            'branding' => $branding,
+            'settings' => $settings,
+            'mode' => 'pdf',
+        ])->render();
+
+        $certificate->front_content = $frontContent;
+        $certificate->back_content = $backContent;
+        $certificate->issued_at = $issuedAt;
+        $certificate->save();
+
+        $pdf = $this->buildPdf($frontPdfContent, $backPdfContent);
+
+        return response()->streamDownload(function () use ($pdf) {
+            echo $pdf->output();
+        }, 'certificado-' . $course->slug . '.pdf');
+    }
+
+    public function render()
+    {
+        $enrollments = $this->enrollments();
+        $studentName = Auth::user()?->preferredName() ?? 'Aluno';
+        $courseName = $this->course?->title;
+        $formattedCompletionDate = $this->formattedCompletionDate();
+        $periodStart = $this->formatDate($this->course?->created_at?->format('Y-m-d'));
+        $periodEnd = $formattedCompletionDate;
+        $workload = $this->workloadHours($this->course);
+        $formattedCpf = $this->formatCpf($this->cpf);
+        $frontBackgroundUrl = $this->backgroundUrl($this->branding?->front_background_path);
+        $backBackgroundUrl = $this->backgroundUrl($this->branding?->back_background_path);
+        $backPreviewParagraphs = $this->backPreviewParagraphs($this->course);
+
+        return view('livewire.certificado.checkout', [
+            'enrollments' => $enrollments,
+            'studentName' => $studentName,
+            'courseName' => $courseName,
+            'formattedCompletionDate' => $formattedCompletionDate,
+            'periodStart' => $periodStart,
+            'periodEnd' => $periodEnd,
+            'workload' => $workload,
+            'formattedCpf' => $formattedCpf,
+            'frontBackgroundUrl' => $frontBackgroundUrl,
+            'backBackgroundUrl' => $backBackgroundUrl,
+            'backPreviewParagraphs' => $backPreviewParagraphs,
+        ]);
+    }
+
+    private function resetMessages(): void
+    {
+        $this->statusMessage = null;
+        $this->errorMessage = null;
+    }
+
+    private function enrollments()
+    {
+        $user = Auth::user();
+
+        if (! $user) {
+            return collect();
+        }
+
+        return Enrollment::with('course')
+            ->where('user_id', $user->id)
+            ->latest('created_at')
+            ->get();
+    }
+
+    private function findEnrollment(int $courseId): ?Enrollment
+    {
+        $user = Auth::user();
+
+        if (! $user) {
+            return null;
+        }
+
+        return Enrollment::with(['course.certificateBranding'])
+            ->where('user_id', $user->id)
+            ->where('course_id', $courseId)
+            ->first();
+    }
+
+    private function setEnrollment(Enrollment $enrollment, bool $forceDate = false): void
+    {
+        $this->enrollment = $enrollment;
+        $this->course = $enrollment->course;
+        $this->courseId = $enrollment->course_id;
+        $this->branding = $this->course
+            ? $this->resolveBranding($this->course)
+            : null;
+
+        if (($forceDate || ! $this->completionDate) && $enrollment->completed_at) {
+            $this->completionDate = $enrollment->completed_at->format('Y-m-d');
+        }
+    }
+
+    private function resolveIssuedAt(?string $inputDate, Enrollment $enrollment): Carbon
+    {
+        $fallback = $enrollment->completed_at?->format('Y-m-d');
+        $date = $inputDate ?: $fallback ?: now()->format('Y-m-d');
+
+        try {
+            return Carbon::parse($date);
+        } catch (\Throwable $exception) {
+            return now();
+        }
+    }
+
+    private function resolveBranding(Course $course): CertificateBranding
+    {
+        return $course->certificateBranding
+            ?? CertificateBranding::firstOrCreate(['course_id' => null]);
     }
 
     private function formatDate(?string $value): ?string
@@ -197,13 +274,58 @@ class Checkout extends Component
         }
     }
 
-    private function buildBackPreviewParagraphs(Course $course): array
+    private function formattedCompletionDate(): ?string
     {
+        $value = $this->completionDate ?: $this->enrollment?->completed_at?->format('Y-m-d');
+
+        return $this->formatDate($value);
+    }
+
+    private function formatCpf(?string $cpf): ?string
+    {
+        if (! $cpf || mb_strlen($cpf) !== 11) {
+            return null;
+        }
+
+        return sprintf(
+            '%s.%s.%s-%s',
+            substr($cpf, 0, 3),
+            substr($cpf, 3, 3),
+            substr($cpf, 6, 3),
+            substr($cpf, 9, 2),
+        );
+    }
+
+    private function workloadHours(?Course $course): ?int
+    {
+        if (! $course || ! $course->duration_minutes) {
+            return null;
+        }
+
+        return (int) round($course->duration_minutes / 60);
+    }
+
+    private function backgroundUrl(?string $path): ?string
+    {
+        if (! $path) {
+            return null;
+        }
+
+        return asset('storage/' . ltrim($path, '/'));
+    }
+
+    private function backPreviewParagraphs(?Course $course): array
+    {
+        if (! $course) {
+            return [];
+        }
+
+        $course->loadMissing(['modules.lessons']);
         $paragraphs = [];
 
         foreach ($course->modules as $moduleIndex => $module) {
             $moduleNumber = $module->position ?: ($moduleIndex + 1);
-            $line = "Módulo {$moduleNumber}: {$module->title}";
+            $line = "Modulo {$moduleNumber}: {$module->title}";
 
             if ($module->lessons->isNotEmpty()) {
                 $lessonFragments = $module->lessons->values()->map(function ($lesson, $lessonIndex) {
@@ -211,7 +333,7 @@ class Checkout extends Component
                     return "Aula {$lessonNumber}: {$lesson->title}";
                 });
 
-                $line .= '. '.$lessonFragments->implode('. ').'.';
+                $line .= '. ' . $lessonFragments->implode('. ') . '.';
             } else {
                 $line .= '.';
             }
@@ -222,81 +344,41 @@ class Checkout extends Component
         return $paragraphs;
     }
 
-    public function getFormattedCpfProperty(): ?string
+    private function qrDataUri(?string $publicUrl): ?string
     {
-        if (! $this->cpf || mb_strlen($this->cpf) !== 11) {
+        if (! $publicUrl) {
             return null;
         }
 
-        return sprintf(
-            '%s.%s.%s-%s',
-            substr($this->cpf, 0, 3),
-            substr($this->cpf, 3, 3),
-            substr($this->cpf, 6, 3),
-            substr($this->cpf, 9, 2),
-        );
-    }
-
-    private function validateStep(): void
-    {
-        if ($this->step === 2) {
-            $this->validate([
-                'certificateName' => ['required', 'string'],
-                'completionDate' => ['required', 'date'],
+        try {
+            $response = Http::withoutVerifying()->timeout(5)->get('https://api.qrserver.com/v1/create-qr-code/', [
+                'size' => '240x240',
+                'data' => $publicUrl,
             ]);
-        }
 
-        if ($this->step === 3) {
-            $this->validate([
-                'whatsapp' => ['required', 'regex:/^\+\d{10,15}$/'],
-                'email' => ['required', 'string'],
-            ]);
-        }
+            if (! $response->successful()) {
+                return null;
+            }
 
-        if ($this->step === 4 && empty($this->cpf)) {
-            $this->validate([
-                'cpf' => ['required', 'digits:11'],
-            ]);
+            return 'data:image/png;base64,' . base64_encode($response->body());
+        } catch (\Throwable $exception) {
+            return null;
         }
     }
 
-    private function resolveBranding(Course $course): CertificateBranding
+    private function buildPdf(string $frontContent, string $backContent): Dompdf
     {
-        return $course->certificateBranding
-            ?? CertificateBranding::firstOrCreate(['course_id' => null]);
-    }
+        $options = new Options();
+        $options->set('defaultFont', 'Inter');
+        $options->setIsRemoteEnabled(true);
 
-    private function courses(): Collection
-    {
-        $publishedQuery = Course::query()->where('status', 'published');
+        $dompdf = new Dompdf($options);
+        $html = view('learning.certificates.pdf', compact('frontContent', 'backContent'))->render();
 
-        if ($publishedQuery->exists()) {
-            return $publishedQuery->orderBy('title')->get();
-        }
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('a4', 'landscape');
+        $dompdf->render();
 
-        return Course::query()->orderBy('title')->get();
-    }
-
-    private function workloadOptions(): array
-    {
-        return [
-            [
-                'hours' => 40,
-                'price' => 'R$ 29,90',
-            ],
-            [
-                'hours' => 80,
-                'price' => 'R$ 49,90',
-            ],
-            [
-                'hours' => 160,
-                'price' => 'R$ 69,90',
-                'highlight' => true,
-            ],
-            [
-                'hours' => 240,
-                'price' => 'R$ 97,00',
-            ],
-        ];
+        return $dompdf;
     }
 }

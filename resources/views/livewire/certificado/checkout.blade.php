@@ -1,343 +1,127 @@
-<div class="w-full max-w-[460px] bg-white rounded-xl shadow p-5">
-    @if ($showSuccess)
-        <div class="space-y-6">
-            <div class="space-y-2 text-center">
-                <h1 class="text-2xl font-bold text-black font-['Poppins']">Pagamento confirmado!</h1>
-                <p class="text-base text-black font-['Inter']">
-                    Seu certificado está em processamento e estará disponível em instantes.
-                </p>
-            </div>
+<section class="space-y-6">
+    <header class="rounded-card bg-white p-6 shadow-card">
+        <p class="text-sm uppercase tracking-wide text-edux-primary">Certificado</p>
+        <h1 class="font-display text-3xl text-edux-primary">Gerar certificado</h1>
+        <p class="text-slate-600 text-sm">Selecione o curso, confirme os dados e gere seu PDF.</p>
+    </header>
 
-            <div class="rounded-lg border border-gray-200 bg-gray-50 p-4 space-y-2 font-['Inter'] text-sm text-gray-700">
-                <div class="flex justify-between">
-                    <span>Curso</span>
-                    <span class="font-semibold text-black">{{ $courseName !== '' ? $courseName : 'Curso não informado' }}</span>
-                </div>
-                <div class="flex justify-between">
-                    <span>Nome no certificado</span>
-                    <span class="font-semibold text-black">{{ $certificateName }}</span>
-                </div>
-                <div class="flex justify-between">
-                    <span>Carga horária</span>
-                    <span class="font-semibold text-black">{{ $workload }}h</span>
-                </div>
-            </div>
-
-            <div class="space-y-3">
-                <a href="{{ route('certificado.download') }}" class="edux-btn w-full flex items-center justify-center">
-                    Baixar certificado
-                </a>
-                <button type="button" class="w-full h-[50px] rounded-xl border border-gray-300 font-bold text-black font-['Inter']">
-                    Enviar novamente por WhatsApp
-                </button>
-                <button type="button" class="w-full h-[50px] rounded-xl border border-gray-300 font-bold text-black font-['Inter']">
-                    Enviar novamente por e-mail
-                </button>
-            </div>
+    @if ($errorMessage)
+        <div class="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+            {{ $errorMessage }}
         </div>
-    @elseif ($showPix)
-        <div class="space-y-6">
-            <div class="space-y-2 text-center">
-                <h1 class="text-2xl font-bold text-black font-['Poppins']">Pagamento via PIX</h1>
-                <p class="text-base text-black font-['Inter']">
-                    Escaneie o QR Code ou copie o código PIX abaixo.
-                </p>
-            </div>
+    @endif
 
-            <div class="flex justify-center">
-                <div class="h-48 w-48 rounded-lg border border-dashed border-gray-300 flex items-center justify-center text-sm text-gray-500 font-['Inter']">
-                    QR Code (mock)
-                </div>
-            </div>
-
-            <div class="space-y-2">
-                <label class="text-sm font-semibold text-black font-['Inter']">Código PIX copia e cola</label>
-                <div class="rounded-lg border border-gray-200 bg-gray-50 p-3 text-xs text-gray-700 font-['Inter'] break-all">
-                    00020101021226880014br.gov.bcb.pix2563pix.exemplo.com/qrcode1234567890
-                </div>
-                <button
-                    type="button"
-                    x-data
-                    x-on:click="navigator.clipboard.writeText('00020101021226880014br.gov.bcb.pix2563pix.exemplo.com/qrcode1234567890')"
-                    class="w-full h-[50px] rounded-xl border border-gray-300 font-bold text-black font-['Inter']"
-                >
-                    Copiar código
-                </button>
-            </div>
-
-            <button type="button" wire:click="confirmPayment" class="edux-btn w-full flex items-center justify-center">
-                Já paguei
-            </button>
+    @if ($statusMessage)
+        <div class="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+            {{ $statusMessage }}
         </div>
-    @else
+    @endif
+
+    <div class="grid gap-6">
         <div class="space-y-6">
-            <div class="space-y-2 text-center">
-                <p class="text-sm text-gray-500 font-['Inter']">Passo {{ $step }} de 5</p>
-                <h1 class="text-2xl font-bold text-black font-['Poppins']">Emitir certificado</h1>
-            </div>
+            <div class="rounded-card bg-white p-6 shadow-card space-y-4">
+                @if ($enrollments->isEmpty())
+                    <p class="text-sm text-slate-500">
+                        Voce ainda nao possui matriculas. Entre em um curso para gerar certificados.
+                    </p>
+                @else
+                    <label class="space-y-2 text-sm font-semibold text-slate-600 block">
+                        <span>Curso matriculado</span>
+                        <select
+                            name="course_id"
+                            wire:model.live="courseId"
+                            class="w-full rounded-xl border border-edux-line px-4 py-3 focus:border-edux-primary focus:ring-edux-primary/30"
+                        >
+                            <option value="">Selecione um curso</option>
+                            @foreach ($enrollments as $enrollment)
+                                <option value="{{ $enrollment->course_id }}">
+                                    {{ $enrollment->course?->title ?? 'Curso sem titulo' }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('courseId') <span class="text-xs text-red-500">{{ $message }}</span> @enderror
+                    </label>
 
-            @if ($step === 1)
-                <div class="space-y-4">
-                    <div class="space-y-1 text-center">
-                        <p class="text-sm text-gray-500 font-['Inter']">Curso selecionado</p>
-                        <p class="text-lg font-semibold text-black font-['Inter']">
-                            {{ $courseName !== '' ? $courseName : 'Curso não informado' }}
-                        </p>
-                        <button type="button" wire:click="openCourseModal" class="text-sm font-semibold text-blue-600 font-['Inter']">
-                            Não é este o curso? Trocar curso
-                        </button>
-                    </div>
-
-                    <div class="rounded-lg border border-gray-200 bg-gray-50 p-4 text-sm text-gray-700 font-['Inter']">
-                        Declaro que concluí este curso e assisti todas as aulas.
-                    </div>
-
-                    <button
-                        type="button"
-                        wire:click="nextStep"
-                        @disabled(! $this->canAdvanceFromStepOne())
-                        class="edux-btn w-full flex items-center justify-center"
-                    >
-                        Confirmar conclusão
-                    </button>
-                </div>
-            @endif
-
-            @if ($step === 2)
-                <div class="space-y-5">
-                    <div class="space-y-2">
-                        <label class="text-sm font-semibold text-black font-['Inter']">Nome no certificado</label>
-                        <input
-                            type="text"
-                            wire:model.live.debounce.300ms="certificateName"
-                            class="w-full rounded-lg border border-gray-300 px-3 py-3 font-['Inter']"
-                            placeholder="Digite seu nome completo"
-                        />
-                        @error('certificateName')
-                            <p class="text-xs text-red-500 font-['Inter']">{{ $message }}</p>
-                        @enderror
-                        <p class="text-xs text-gray-500 font-['Inter']">
-                            Confira o nome — depois do pagamento não será possível alterar.
-                        </p>
-                    </div>
-
-                    <div class="space-y-2">
-                        <label class="text-sm font-semibold text-black font-['Inter']">Data de conclusão</label>
+                    <label class="space-y-2 text-sm font-semibold text-slate-600 block">
+                        <span>Data de conclusao</span>
                         <input
                             type="date"
                             wire:model.live="completionDate"
-                            class="w-full rounded-lg border border-gray-300 px-3 py-3 font-['Inter']"
-                        />
-                        @error('completionDate')
-                            <p class="text-xs text-red-500 font-['Inter']">{{ $message }}</p>
-                        @enderror
-                    </div>
+                            class="w-full rounded-xl border border-edux-line px-4 py-3 focus:border-edux-primary focus:ring-edux-primary/30"
+                        >
+                        @error('completionDate') <span class="text-xs text-red-500">{{ $message }}</span> @enderror
+                        <p class="text-xs text-slate-500">
+                            Se nao informar, usaremos a data registrada na matricula.
+                        </p>
+                    </label>
 
-                    <div class="space-y-2">
-                        <label class="text-sm font-semibold text-black font-['Inter']">CPF (opcional)</label>
+                    <label class="space-y-2 text-sm font-semibold text-slate-600 block">
+                        <span>CPF (opcional)</span>
                         <input
                             type="text"
-                            wire:model.defer="cpf"
-                            class="w-full rounded-lg border border-gray-300 px-3 py-3 font-['Inter']"
-                            placeholder="Somente números"
-                        />
-                        <p class="text-xs text-gray-500 font-['Inter']">
-                            Informe agora para agilizar o PIX. Se preferir, adiciona no próximo passo.
-                        </p>
-                    </div>
+                            wire:model.live.debounce.300ms="cpf"
+                            placeholder="Somente numeros"
+                            class="w-full rounded-xl border border-edux-line px-4 py-3 focus:border-edux-primary focus:ring-edux-primary/30"
+                        >
+                        @error('cpf') <span class="text-xs text-red-500">{{ $message }}</span> @enderror
+                    </label>
 
-                    <div class="space-y-4">
-                        <div class="flex items-center justify-between">
-                            <p class="text-sm font-semibold text-black font-['Inter']">Pré-visualização</p>
-                            <p class="text-xs text-gray-500 font-['Inter']">Layout oficial do certificado</p>
-                        </div>
-                        <div class="flex flex-col gap-6">
-                            <div class="flex justify-center">
-                                <x-certificate.front-preview
-                                    :student-name="$certificateName"
-                                    :course-name="$courseName"
-                                    :completed-at="$formattedCompletionDate"
-                                    :workload="$workload"
-                                    :completed-at-start="$completionPeriodStart"
-                                    :completed-at-end="$completionPeriodEnd"
-                                    :issuer-portal="null"
-                                    :issuer-institution="null"
-                                    :cpf="$formattedCpf"
-                                    :background="$frontBackgroundUrl"
-                                />
-                            </div>
-                            <div class="flex justify-center">
-                                <x-certificate.back-preview
-                                    :paragraphs="$backPreviewParagraphs"
-                                    :background="$backBackgroundUrl"
-                                />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            @endif
+                    <label class="space-y-2 text-sm font-semibold text-slate-600 block">
+                        <span>Concluiu todas as aulas?</span>
+                        <select
+                            name="completion_confirmed"
+                            wire:model.live="completionConfirmed"
+                            class="w-full rounded-xl border border-edux-line px-4 py-3 focus:border-edux-primary focus:ring-edux-primary/30"
+                        >
+                            <option value="">Selecione</option>
+                            <option value="yes">Sim, conclui todas as aulas</option>
+                            <option value="no">Ainda nao</option>
+                        </select>
+                        @error('completionConfirmed') <span class="text-xs text-red-500">{{ $message }}</span> @enderror
+                    </label>
 
-            @if ($step === 3)
-                <div class="space-y-4">
-                    <div class="space-y-2">
-                        <label class="text-sm font-semibold text-black font-['Inter']">WhatsApp</label>
-                        <div class="relative">
-                            <div wire:ignore>
-                                <input
-                                    type="tel"
-                                    id="whatsapp-intl"
-                                    class="js-intl-phone w-full rounded-lg border border-gray-300 px-3 py-3 font-['Inter'] focus:ring-2 focus:ring-blue-200"
-                                    placeholder="+55 (11) 99999-9999"
-                                    data-target="whatsapp-hidden"
-                                />
-                            </div>
-                            <input type="hidden" id="whatsapp-hidden" wire:model.defer="whatsapp" />
-                        </div>
-                        @error('whatsapp')
-                            <p class="text-xs text-red-500 font-['Inter']">{{ $message }}</p>
-                        @enderror
-                        <p class="text-xs text-gray-500 font-['Inter']">
-                            Informe o telefone com o DDI. Usaremos para enviar o certificado.
-                        </p>
-                    </div>
+                    @php
+                        $disableGenerate = $enrollments->isEmpty() || ! $courseId || $completionConfirmed !== 'yes';
+                    @endphp
 
-                    <div class="space-y-2">
-                        <label class="text-sm font-semibold text-black font-['Inter']">E-mail</label>
-                        <input
-                            type="email"
-                            wire:model.defer="email"
-                            class="w-full rounded-lg border border-gray-300 px-3 py-3 font-['Inter']"
-                            placeholder="seuemail@exemplo.com"
-                        />
-                        @error('email')
-                            <p class="text-xs text-red-500 font-['Inter']">{{ $message }}</p>
-                        @enderror
-                        <p class="text-xs text-gray-500 font-['Inter']">
-                            O certificado também será enviado por e-mail.
-                        </p>
-                    </div>
-                </div>
-            @endif
-
-            @if ($step === 4)
-                <div class="space-y-4">
-                    <p class="text-sm text-gray-500 font-['Inter']">
-                        Quanto maior a carga, maior o valor do certificado.
-                    </p>
-
-                    <div class="grid grid-cols-1 gap-3">
-                        @foreach ($workloads as $option)
-                            @php
-                                $isSelected = $workload === $option['hours'];
-                                $isHighlight = $option['highlight'] ?? false;
-                            @endphp
-                            <button
-                                type="button"
-                                wire:click="$set('workload', {{ $option['hours'] }})"
-                                class="w-full rounded-xl border px-4 py-4 text-left font-['Inter'] {{ $isSelected ? 'border-yellow-400 bg-yellow-50' : 'border-gray-200 bg-white' }}"
-                            >
-                                <div class="flex items-center justify-between">
-                                    <div>
-                                        <p class="text-lg font-semibold text-black">{{ $option['hours'] }}h</p>
-                                        <p class="text-sm text-gray-500">{{ $option['price'] }}</p>
-                                    </div>
-                                    @if ($isHighlight)
-                                        <span class="rounded-full bg-yellow-200 px-3 py-1 text-xs font-semibold text-black">Mais escolhida</span>
-                                    @endif
-                                </div>
-                            </button>
-                        @endforeach
-                    </div>
-
-                    @if (! $cpf)
-                        <div class="space-y-2">
-                            <label class="text-sm font-semibold text-black font-['Inter']">CPF (obrigatório para PIX)</label>
-                            <input
-                                type="text"
-                                wire:model.defer="cpf"
-                                class="w-full rounded-lg border border-gray-300 px-3 py-3 font-['Inter']"
-                                placeholder="Somente números"
-                            />
-                            @error('cpf')
-                                <p class="text-xs text-red-500 font-['Inter']">{{ $message }}</p>
-                            @enderror
-                            <p class="text-xs text-gray-500 font-['Inter']">
-                                Precisamos do CPF para processar o pagamento via PIX. Preencha aqui para avançar.
-                            </p>
-                        </div>
-                    @else
-                        <div class="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-900 font-['Inter']">
-                            ✅ CPF informado: {{ $formattedCpf ?? $cpf }}
-                        </div>
-                    @endif
-                </div>
-            @endif
-
-            @if ($step === 5)
-                <div class="space-y-4">
-                    <div class="rounded-lg border border-gray-200 bg-gray-50 p-4 space-y-2 font-['Inter'] text-sm text-gray-700">
-                        <div class="flex justify-between">
-                            <span>Curso</span>
-                            <span class="font-semibold text-black">{{ $courseName !== '' ? $courseName : 'Curso não informado' }}</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span>Nome no certificado</span>
-                            <span class="font-semibold text-black">{{ $certificateName }}</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span>Carga horária</span>
-                            <span class="font-semibold text-black">{{ $workload }}h</span>
-                        </div>
-                    </div>
-
-                    <button type="button" wire:click="startPixPayment" class="edux-btn w-full flex items-center justify-center">
-                        Pagar com PIX
-                    </button>
-                </div>
-            @endif
-
-            <div class="flex items-center justify-between pt-4">
-                <button
-                    type="button"
-                    wire:click="previousStep"
-                    class="text-sm font-semibold text-gray-600 font-['Inter'] disabled:opacity-40"
-                    @if ($step === 1) disabled @endif
-                >
-                    Voltar
-                </button>
-                @if ($step > 1 && $step < 5)
-                    <button type="button" wire:click="nextStep" class="text-sm font-semibold text-blue-600 font-['Inter']">
-                        Próximo
+                    <button
+                        type="button"
+                        wire:click="generateCertificate"
+                        class="edux-btn w-full"
+                        @disabled($disableGenerate)
+                    >
+                        Gerar certificado
                     </button>
                 @endif
             </div>
-        </div>
 
-        @if ($showCourseModal)
-            <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-                <div class="w-full max-w-md rounded-xl bg-white p-5 space-y-4">
-                    <div class="flex items-center justify-between">
-                        <h2 class="text-lg font-semibold text-black font-['Poppins']">Selecione o curso</h2>
-                        <button type="button" wire:click="closeCourseModal" class="text-sm font-semibold text-gray-500 font-['Inter']">
-                            Fechar
-                        </button>
+            <div class="rounded-card bg-white p-6 shadow-card space-y-3">
+                <p class="text-sm uppercase tracking-wide text-edux-primary">Resumo</p>
+                <div class="space-y-2 text-sm text-slate-600">
+                    <div class="flex items-center justify-between gap-3">
+                        <span>Aluno</span>
+                        <span class="font-semibold text-slate-800">{{ $studentName }}</span>
                     </div>
-
-                    <div class="max-h-64 overflow-y-auto space-y-2">
-                        @forelse ($courses as $course)
-                            <button
-                                type="button"
-                                wire:click="selectCourse({{ $course->id }})"
-                                class="w-full rounded-lg border border-gray-200 px-4 py-3 text-left font-['Inter'] hover:border-blue-400"
-                            >
-                                {{ $course->title }}
-                            </button>
-                        @empty
-                            <p class="text-sm text-gray-500 font-['Inter']">Nenhum curso disponível.</p>
-                        @endforelse
+                    <div class="flex items-center justify-between gap-3">
+                        <span>Curso</span>
+                        <span class="font-semibold text-slate-800">{{ $courseName ?? 'Selecione um curso' }}</span>
+                    </div>
+                    <div class="flex items-center justify-between gap-3">
+                        <span>Conclusao</span>
+                        <span class="font-semibold text-slate-800">{{ $formattedCompletionDate ?? 'Nao definida' }}</span>
+                    </div>
+                    <div class="flex items-center justify-between gap-3">
+                        <span>CPF</span>
+                        <span class="font-semibold text-slate-800">{{ $formattedCpf ?? 'Nao informado' }}</span>
+                    </div>
+                    <div class="flex items-center justify-between gap-3">
+                        <span>Confirmacao</span>
+                        <span class="font-semibold text-slate-800">
+                            {{ $completionConfirmed === 'yes' ? 'Concluido' : 'Pendente' }}
+                        </span>
                     </div>
                 </div>
             </div>
-        @endif
-    @endif
-</div>
+        </div>
+    </div>
+</section>

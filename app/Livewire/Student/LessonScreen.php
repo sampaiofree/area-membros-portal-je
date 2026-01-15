@@ -11,6 +11,7 @@ use App\Models\LessonCompletion;
 use App\Models\SystemSetting;
 use App\Support\EnsuresStudentEnrollment;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use Livewire\Component;
 
@@ -132,6 +133,7 @@ class LessonScreen extends Component
             $certificate->number = 'EDUX-' . strtoupper(Str::random(8));
             $certificate->public_token = (string) Str::uuid();
             $publicUrl = route('certificates.verify', $certificate->public_token);
+            $qrDataUri = $this->qrDataUri($publicUrl);
 
             $certificate->front_content = view('learning.certificates.templates.front', [
                 'course' => $this->course,
@@ -140,6 +142,7 @@ class LessonScreen extends Component
                 'issuedAt' => $issuedAt,
                 'publicUrl' => $publicUrl,
                 'settings' => $settings,
+                'qrDataUri' => $qrDataUri,
             ])->render();
 
             $certificate->back_content = view('learning.certificates.templates.back', [
@@ -257,6 +260,28 @@ class LessonScreen extends Component
         }
 
         return [true, null];
+    }
+
+    private function qrDataUri(?string $publicUrl): ?string
+    {
+        if (! $publicUrl) {
+            return null;
+        }
+
+        try {
+            $response = Http::withoutVerifying()->timeout(5)->get('https://api.qrserver.com/v1/create-qr-code/', [
+                'size' => '240x240',
+                'data' => $publicUrl,
+            ]);
+
+            if (! $response->successful()) {
+                return null;
+            }
+
+            return 'data:image/png;base64,' . base64_encode($response->body());
+        } catch (\Throwable $exception) {
+            return null;
+        }
     }
 
     private function resolveBranding(Course $course): CertificateBranding

@@ -1,6 +1,7 @@
 ﻿<?php
 
 use App\Http\Controllers\Admin\KavooController;
+use App\Http\Controllers\Admin\EnrollmentController;
 use App\Http\Controllers\Admin\SystemIdentityController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\AuthController;
@@ -39,10 +40,7 @@ Route::get('/test-gs', function () {
 // --- Rotas públicas ---
 // Redireciona para dashboard (apenas conveniência)
 Route::redirect('/', '/dashboard');
-// Visualiza página do certificado (sem autenticação)
-Route::get('/certificado', [CertificadoController::class, 'index'])->name('certificado.index');
-// Download público do certificado
-Route::get('/certificado/download', [CertificadoController::class, 'download'])->name('certificado.download');
+
 // Valida certificado publicado via token
 Route::get('/certificates/verify/{token}', PublicCertificateController::class)->name('certificates.verify');
 // Página pública do curso
@@ -78,6 +76,7 @@ Route::post('/logout', [AuthController::class, 'destroy'])
 Route::middleware('auth')->group(function (): void {
     // Dashboard geral do usuário autenticado
     Route::get('/dashboard', DashboardController::class)->name('dashboard'); 
+    Route::get('/certificado', [CertificadoController::class, 'index'])->name('certificado.index');
     // Edição do perfil do aluno
     Route::view('/conta', 'account.profile')->name('account.edit');
 
@@ -137,6 +136,13 @@ Route::middleware('auth')->group(function (): void {
             Route::get('kavoo/{kavoo}/edit', [KavooController::class, 'edit'])->name('admin.kavoo.edit');
             Route::put('kavoo/{kavoo}', [KavooController::class, 'update'])->name('admin.kavoo.update');
             Route::delete('kavoo/{kavoo}', [KavooController::class, 'destroy'])->name('admin.kavoo.destroy');
+            // Administracao de matriculas
+            Route::get('enroll', [EnrollmentController::class, 'index'])->name('admin.enroll.index');
+            Route::get('enroll/create', [EnrollmentController::class, 'create'])->name('admin.enroll.create');
+            Route::post('enroll', [EnrollmentController::class, 'store'])->name('admin.enroll.store');
+            Route::get('enroll/{enrollment}/edit', [EnrollmentController::class, 'edit'])->name('admin.enroll.edit');
+            Route::put('enroll/{enrollment}', [EnrollmentController::class, 'update'])->name('admin.enroll.update');
+            Route::delete('enroll/{enrollment}', [EnrollmentController::class, 'destroy'])->name('admin.enroll.destroy');
         });
 
     Route::middleware('role:admin')->group(function (): void {
