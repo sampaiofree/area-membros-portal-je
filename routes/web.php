@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\KavooController;
 use App\Http\Controllers\Admin\EnrollmentController;
+use App\Http\Controllers\Admin\GeneratedCertificateController;
 use App\Http\Controllers\Admin\SystemIdentityController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\AuthController;
@@ -145,6 +146,12 @@ Route::middleware('auth')->group(function (): void {
             // Lista de pagamentos de certificados
             Route::view('certificates/payments', 'admin.certificates.payments')
                 ->name('admin.certificates.payments');
+            // Lista de certificados gerados
+            Route::get('certificados-gerados', [GeneratedCertificateController::class, 'index'])
+                ->name('admin.certificates.generated.index');
+            // Download do certificado gerado (admin)
+            Route::get('certificados-gerados/{certificate}/download', [GeneratedCertificateController::class, 'download'])
+                ->name('admin.certificates.generated.download');
             // Central de notificações administrativas
             Route::view('notifications', 'admin.notifications.index')
                 ->name('admin.notifications.index');
