@@ -18,8 +18,17 @@ use Illuminate\Support\Facades\Storage;
 
     if ($mode === 'pdf' && $branding?->front_background_path) {
         $path = ltrim($branding->front_background_path, '/');
-        if (Storage::disk('public')->exists($path)) {
-            $backgroundUrl = 'file://' . str_replace('\\', '/', Storage::disk('public')->path($path));
+        if (str_starts_with($path, 'storage/')) {
+            $path = substr($path, 8);
+        }
+
+        $disk = Storage::disk('public');
+        if ($disk->exists($path)) {
+            $absolutePath = str_replace('\\', '/', $disk->path($path));
+            if (preg_match('/^[A-Za-z]:\\//', $absolutePath)) {
+                $absolutePath = '/' . $absolutePath;
+            }
+            $backgroundUrl = 'file://' . $absolutePath;
         }
     }
 
